@@ -26,7 +26,7 @@
    Open the project folder in your code editor.
 
 3. **Firebase Configuration**:
-   Replace the Firebase configuration in `index.html` with your Firebase project credentials:
+   Replace the Firebase configuration in `index.html` & `dashboard.html` with your Firebase project credentials:
 
     ```javascript
     const firebaseConfig = {
