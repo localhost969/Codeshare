@@ -1,22 +1,21 @@
-```markdown
 # CodeShare
 
 **CodeShare** is a web application that allows users to share, edit, delete, and generate QR codes for their code snippets. The app uses Firebase for data storage and provides a neon-themed UI with CRUD functionalities.
 
-## Features
+# Features
 - **Username-based Access**: Users enter a username to access their personalized dashboard.
 - **CRUD Operations**: Create, read, update, and delete code snippets.
 - **QR Code Sharing**: Generate a QR code for each code snippet to share easily.
 
 
-## Tech Stack
+# Tech Stack
 - **HTML5**: Page structure and content.
 - **CSS3**: Neon-themed styling.
 - **JavaScript**: Client-side functionality.
 - **Firebase**: Firestore for data storage.
 - **QR Code Generator**: For generating and sharing QR codes.
 
-## Setup & Installation
+# Setup & Installation
 
 1. **Clone the repository**:
    ```bash
@@ -44,7 +43,7 @@
 4. **Start the Application**:
    Open `index.html` in a web browser to run the app.
 
-## File Structure
+# File Structure
 
 ```
 /CodeShare
@@ -53,10 +52,10 @@
 └── README.md               # Project documentation
 ```
 
-## Contributing
+# Contributing
 Feel free to fork the repository, make changes, and submit a pull request.
 
-## License
+# License
 This project is open-source and available under the [MIT License](LICENSE).
 
 ## Future Enhancements
