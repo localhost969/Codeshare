@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeshare Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  background-color: #0f0f0f; /* Dark mode background */
+  color: #33ff33; /* Green monospace text */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  overflow-y: auto;
+  flex-direction: column;
+  font-size: 1rem; /* Slightly larger font for readability */
+  padding: 10px;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #0f0f0f; /* Dark background for the dashboard */
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: translateY(30px);
+  animation: fadeIn 1.5s ease-in-out forwards;
+}
+
+.logout-button {
+  background: linear-gradient(135deg, #33ff33, #33cc33);
+  color: #1e1e1e;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+}
+
+.logout-button:hover {
+  background: linear-gradient(135deg, #33cc33, #33ff33);
+  box-shadow: 0 0 15px rgba(51, 255, 51, 0.7);
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-section input,
+.input-section textarea {
+  background-color: #333;
+  color: #33ff33; /* Green monospace text */
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #444;
+  width: 100%;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input-section input:focus,
+.input-section textarea:focus {
+  border-color: #33ff33;
+}
+
+.input-section button {
+  padding: 12px 20px;
+  background: #33ff33;
+  color: #1e1e1e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+}
+
+.input-section button:hover {
+  background: #33cc33;
+  box-shadow: 0 0 15px rgba(51, 255, 51, 0.7);
+}
+
+.snippets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.snippet {
+  background-color: #0f0f0f;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(51, 255, 51, 0.3);
+  transition: transform 0.3s ease-in-out;
+}
+
+.snippet:hover {
+  transform: translateY(-5px);
+}
+
+.snippet h3 {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #33ff33;
+}
+
+.snippet pre {
+  font-family: 'Courier New', monospace;
+  color: #33ff33;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.snippet button {
+  padding: 8px 16px;
+  background: #33ff33;
+  color: #1e1e1e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+}
+
+.snippet button:hover {
+  background: #33cc33;
+  box-shadow: 0 0 15px rgba(51, 255, 51, 0.7);
+}
+
+.tooltip {
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.snippet button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.editable-code-container {
+  display: flex;
+}
+
+.line-numbers {
+  background: #333;
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  color: #888;
+  text-align: right;
+  user-select: none;
+  width: 35px;
+  border-right: 1px solid #444;
+  border-radius: 5px 0 0 5px;
+}
+
+.editable-code {
+  background: #333;
+  color: #33ff33;
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  border-radius: 0 5px 5px 0;
+  border: 1px solid #444;
+  resize: none;
+  outline: none;
+  width: 100%;
+}
+
+.editable-code:focus {
+  border-color: #33ff33;
+}
+
+.editable-title {
+  background: #333;
+  padding: 8px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  outline: none;
+  width: 100%;
+}
+
+.editable-title:focus {
+  border-color: #33ff33;
+}
+
+.footer {
+  background-color: transparent;
+  color: #33ff33;
+  padding: 12px;
+  font-size: 1.1rem;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer a {
+  text-decoration: none;
+  color: #33ff33;
+}
+
+.footer-highlight {
+  color: #33ff33;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.footer-highlight:hover {
+  color: #ffffff;
+}
+
+.share-button {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background-color: #33ff33;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(51, 255, 51, 0.5);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.share-button img {
+  width: 60%;
+  height: 60%;
+}
+
+.share-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(51, 255, 51, 0.7);
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.popup-content h2 {
+  font-size: 1.5rem;
+  color: #33ff33;
+  margin-bottom: 20px;
+}
+
+#qrcode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  height: 128px;
+}
+
+#url-copy {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+button {
+  padding: 12px 20px;
+  background-color: #33ff33;
+  color: #1e1e1e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 5px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+}
+
+button:hover {
+  background-color: #33cc33;
+  box-shadow: 0 0 15px rgba(51, 255, 51, 0.7);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.no-snippets-message {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 1rem;
+  background-color: #333;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(51, 255, 51, 0.4);
+  margin-top: 20px;
+}
+
+/* Typing animation for the CLI-like input box */
+.input-section input,
+.input-section textarea {
+  border: none;
+  background: #a2bcb3;
+  color: #1e1e1e;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  outline: none;
+  border-bottom: 2px solid #444;
+  transition: all 0.3s ease;
+}
+
+.input-section input[type="text"]::placeholder,
+.input-section textarea::placeholder {
+  color: #444;
+  animation: typing 2s steps(30) 1s infinite;
+}
+
+@keyframes typing {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+</style>
+
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Welcome, <span id="usernameDisplay">User</span></h1>
+      <button class="logout-button" id="logoutButton">Logout</button>
+    </div>
+
+    <div class="input-section">
+      <input type="text" id="newSnippetTitle" placeholder="Title">
+      <textarea id="newSnippetCode" placeholder="Paste your code here..."></textarea>
+      <button id="saveSnippetButton">Save</button>
+    </div>
+
+    <div class="snippets-container" id="snippetsContainer"></div>
+  </div>
+
+	 <div class="footer">
+	  Designed by 
+	  <a href="https://www.instagram.com/vardn.19" target="_blank" class="footer-highlight">Vardan</a>
+	</div>
+<div class="share-button" onclick="sharePage()"> 
+  <img src="https://i.ibb.co/y09rjk8/image.png" alt="Share" />
+</div>
+
+<!-- Popup for QR Code -->
+<div id="qr-popup" class="popup" style="display: none;">
+  <div class="popup-content">
+    <h2>Share This Page</h2>
+    <div id="qrcode"></div>
+    <input type="text" id="url-copy" value="" readonly />
+    <button onclick="copyUrl()">Copy URL</button>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, limit } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBCVUTp-klBCxCWeey6VhbD1ZTFAMeyNwI",
+    authDomain: "test-257e8.firebaseapp.com",
+    projectId: "test-257e8",
+    storageBucket: "test-257e8.firebasestorage.app",
+    messagingSenderId: "996663854495",
+    appId: "1:996663854495:web:a618f04ce983b69ee929aa",
+    measurementId: "G-3308R7KGDR"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const username = urlParams.get('username');
+  document.getElementById('usernameDisplay').innerText = username;
+
+  // ✅ Fetch only the logged-in user's snippets (Directly from Firestore)
+  async function loadSnippets() {
+    const snippetsContainer = document.getElementById('snippetsContainer');
+    snippetsContainer.innerHTML = '';
+
+    if (!username) {
+      alert("Username not found. Please log in.");
+      return;
+    }
+
+    const q = query(
+      collection(db, "snippets"),
+      where("username", "==", username), // ✅ Fetch only the logged-in user's snippets
+      limit(1000) // Prevent excessive data fetching
+    );
+    
+    try {
+      const querySnapshot = await getDocs(q);
+      let hasSnippets = false;
+
+      querySnapshot.forEach((doc) => {
+        hasSnippets = true;
+        const snippetData = doc.data();
+
+        const snippetElement = document.createElement('div');
+        snippetElement.className = 'snippet';
+        snippetElement.setAttribute('data-id', doc.id);
+
+        snippetElement.innerHTML = `
+          <h3 class="editable-title">${snippetData.title}</h3>
+          <div class="editable-code-container">
+            <div class="line-numbers">${generateLineNumbers(snippetData.code)}</div>
+            <textarea class="editable-code" readonly>${snippetData.code}</textarea>
+          </div>
+          <button class="edit-button">Edit</button>
+          <button class="delete-button">Delete</button>
+          <button class="copy-button">Copy</button>
+        `;
+
+        snippetsContainer.appendChild(snippetElement);
+
+        snippetElement.querySelector('.edit-button').addEventListener('click', () => editSnippet(doc.id));
+        snippetElement.querySelector('.delete-button').addEventListener('click', () => deleteSnippet(doc.id));
+        snippetElement.querySelector('.copy-button').addEventListener('click', () => selectCode(doc.id));
+      });
+
+      if (!hasSnippets) {
+        const noSnippetsMessage = document.createElement('div');
+        noSnippetsMessage.className = 'no-snippets-message';
+        noSnippetsMessage.innerHTML = 'No snippets yet, start by creating one.';
+        snippetsContainer.appendChild(noSnippetsMessage);
+      }
+    } catch (error) {
+      console.error("Error loading snippets: ", error);
+    }
+  }
+
+  function generateLineNumbers(code) {
+    return Array.from({ length: code.split('\n').length }, (_, i) => i + 1).join("\n");
+  }
+
+  function editSnippet(id) {
+    const snippet = document.querySelector(`[data-id="${id}"]`);
+    const title = snippet.querySelector('.editable-title');
+    const code = snippet.querySelector('.editable-code');
+    const editButton = snippet.querySelector('.edit-button');
+
+    if (editButton.innerText === 'Edit') {
+      title.contentEditable = true;
+      code.readOnly = false;
+      editButton.innerText = 'Save';
+    } else {
+      title.contentEditable = false;
+      code.readOnly = true;
+      saveSnippet(id, title.innerText, code.value);
+      editButton.innerText = 'Edit';
+    }
+  }
+
+  async function saveSnippet(id, title, code) {
+    try {
+      await updateDoc(doc(db, "snippets", id), { title, code });
+      loadSnippets();
+    } catch (error) {
+      console.error("Error updating snippet: ", error);
+    }
+  }
+
+  async function deleteSnippet(id) {
+    if (confirm('Are you sure you want to delete this snippet?')) {
+      try {
+        await deleteDoc(doc(db, "snippets", id));
+        loadSnippets();
+      } catch (error) {
+        console.error("Error deleting snippet: ", error);
+      }
+    }
+  }
+
+  function selectCode(id) {
+    const snippet = document.querySelector(`[data-id="${id}"]`);
+    navigator.clipboard.writeText(snippet.querySelector('.editable-code').value)
+      .then(() => alert('Code copied to clipboard!'))
+      .catch(err => console.error('Failed to copy: ', err));
+  }
+
+  document.getElementById('saveSnippetButton').addEventListener('click', async () => {
+    const title = document.getElementById('newSnippetTitle').value;
+    const code = document.getElementById('newSnippetCode').value;
+
+    if (title && code && username) {
+      try {
+        await addDoc(collection(db, "snippets"), { title, code, username });
+        document.getElementById('newSnippetTitle').value = '';
+        document.getElementById('newSnippetCode').value = '';
+        loadSnippets();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    } else {
+      alert('Please provide a title, code, and ensure you are logged in.');
+    }
+  });
+
+  document.getElementById('logoutButton').addEventListener('click', () => {
+    window.location.href = "index.html";
+  });
+
+  document.addEventListener("DOMContentLoaded", loadSnippets);
+
+  function sharePage() {
+    document.getElementById('qr-popup').style.display = 'flex';
+    document.getElementById('url-copy').value = window.location.href;
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+      text: window.location.href,
+      width: 128,
+      height: 128,
+    });
+  }
+
+  function copyUrl() {
+    const urlInput = document.getElementById("url-copy");
+    urlInput.select();
+    document.execCommand("copy");
+    alert("URL copied to clipboard!");
+  }
+
+  function closePopup() {
+    document.getElementById('qr-popup').style.display = 'none';
+  }
+</script>
+
+
+
+<script>
+  // Function to trigger the share page popup
+	  function sharePage() {
+	  const popup = document.getElementById("qr-popup");
+	  const qrcodeContainer = document.getElementById("qrcode");
+	  
+	  // Clear any existing QR codes
+	  qrcodeContainer.innerHTML = "";
+
+	  // Generate a new QR code
+	  const url = window.location.href;
+	  const qrCode = new QRCode(qrcodeContainer, {
+		text: url,
+		width: 128,
+		height: 128,
+	  });
+
+	  // Display the popup
+	  document.getElementById("url-copy").value = url;
+	  popup.style.display = "flex";
+	}
+
+	function copyUrl() {
+	  const copyText = document.getElementById("url-copy");
+	  copyText.select();
+	  document.execCommand("copy");
+	  alert("URL copied to clipboard!");
+	}
+
+	function closePopup() {
+	  document.getElementById("qr-popup").style.display = "none";
+	}
+
+</script>
+
+
+</body>
+
+</html>
+
