@@ -109,7 +109,7 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
       const generatedSpaceId = name.trim().toLowerCase().replace(/\s+/g, '-');
       setSpaceId(generatedSpaceId);
       
-      // Check if space exists
+      // Check if space exists 
       const spacesRef = collection(db, 'spaces');
       const spaceRef = doc(spacesRef, generatedSpaceId);
       const spaceDoc = await getDoc(spaceRef);
