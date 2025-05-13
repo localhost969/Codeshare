@@ -39,7 +39,6 @@ const NewSnippetModal = ({ isOpen, onClose, title, onTitleChange, onSubmit }) =>
           <ModalBody py={6}>
             <Box mb={2}>
               <Text fontSize="sm" color="gray.500" mb={4}>
-                Create a new code snippet to start coding. Give it a descriptive name.
               </Text>
             </Box>
             

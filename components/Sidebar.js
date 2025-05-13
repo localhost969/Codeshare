@@ -261,13 +261,32 @@ const Sidebar = ({
         </InputGroup>
         
         <Button 
-          leftIcon={<AddIcon />} 
+          leftIcon={<AddIcon boxSize={3.5} />} 
           colorScheme="teal" 
-          size="sm" 
+          size={{ base: 'md', md: 'sm' }} 
           width="100%" 
+          height={{ base: '42px', md: '36px' }}
           onClick={onAddSnippet}
           fontWeight="medium"
           boxShadow="sm"
+          px={4}
+          py={2}
+          _hover={{
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          }}
+          _active={{
+            transform: 'translateY(0)',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.06)',
+          }}
+          transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+          bgGradient="linear(to-r, teal.400, teal.500)"
+          _focus={{
+            boxShadow: '0 0 0 3px rgba(45, 212, 191, 0.4)',
+          }}
+          whiteSpace="nowrap"
+          overflow="hidden"
+          textOverflow="ellipsis"
         >
           New Snippet
         </Button>

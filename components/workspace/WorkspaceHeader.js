@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Flex,
   Text,
-  Button,
   IconButton,
   Tooltip,
   useColorModeValue,
@@ -10,59 +9,90 @@ import {
   Box,
   Badge
 } from '@chakra-ui/react';
-import { FaSignOutAlt, FaTimes, FaCog } from 'react-icons/fa';
+import { FaSignOutAlt, FaTimes } from 'react-icons/fa';
 
-const WorkspaceHeader = ({ title, hasActiveSnippet, onCloseEditor, onSignOut }) => {
+const WorkspaceHeader = ({ 
+  title, 
+  hasActiveSnippet, 
+  onCloseEditor, 
+  onSignOut
+}) => {
   const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const borderColor = useColorModeValue('gray.100', 'gray.700');
+  const textColor = useColorModeValue('gray.700', 'gray.200');
+  const subtleTextColor = useColorModeValue('gray.500', 'gray.400');
   
   return (
     <Box 
-      py={3} 
-      px={6} 
-      bg={bgColor} 
-      borderBottomWidth="1px" 
+      as="header"
+      position="sticky"
+      top={0}
+      zIndex="sticky"
+      py={2}
+      px={{ base: 4, md: 6 }}
+      bg={bgColor}
+      borderBottomWidth="1px"
       borderColor={borderColor}
       boxShadow="sm"
+      transition="all 0.2s"
     >
-      <Flex justify="space-between" align="center">
-        <Flex align="center">
-          {hasActiveSnippet && (
-            <>
-             <Badge colorScheme="green" variant="subtle">Currently editing : </Badge>
-              <Text fontSize="sm" fontWeight="bold" mr={2}>
+      <Flex justify="space-between" align="center" h="100%">
+        <Flex align="center" minW={0}>
+          {hasActiveSnippet ? (
+            <HStack spacing={3}>
+              <Badge 
+                colorScheme="blue" 
+                variant="subtle"
+                fontSize="xs"
+                py={1}
+                px={2}
+                borderRadius="md"
+              >
+                EDITING
+              </Badge>
+              <Text 
+                fontSize="sm" 
+                fontWeight="medium"
+                color={textColor}
+                noOfLines={1}
+                title={title}
+              >
                 {title}
               </Text>
-             
-            </>
-          )}
-          {!hasActiveSnippet && (
-            <Text fontSize="lg" fontWeight="medium" color="gray.500">
-              
+            </HStack>
+          ) : (
+            <Text 
+              fontSize="sm" 
+              color={subtleTextColor}
+              fontStyle="italic"
+            >
             </Text>
           )}
         </Flex>
         
-        <HStack spacing={2}>
+        <HStack spacing={1}>
           {hasActiveSnippet && (
-            <Tooltip label="Close editor" placement="top">
+            <Tooltip label="Close editor" placement="bottom">
               <IconButton
                 icon={<FaTimes />}
                 aria-label="Close editor"
                 size="sm"
                 variant="ghost"
+                color={textColor}
+                _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
                 onClick={onCloseEditor}
               />
             </Tooltip>
           )}
           
-          <Tooltip label="Exit space" placement="top">
+          <Tooltip label="Sign out" placement="bottom">
             <IconButton
               icon={<FaSignOutAlt />}
-              aria-label="Exit space"
+              aria-label="Sign out"
               size="sm"
-              colorScheme="red"
               variant="ghost"
+              color={textColor}
+              _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
               onClick={onSignOut}
             />
           </Tooltip>
@@ -72,4 +102,4 @@ const WorkspaceHeader = ({ title, hasActiveSnippet, onCloseEditor, onSignOut }) 
   );
 };
 
-export default WorkspaceHeader;
+export default React.memo(WorkspaceHeader);

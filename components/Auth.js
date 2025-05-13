@@ -18,13 +18,21 @@ import {
   Tooltip,
   Divider,
   HStack,
-  Center
+  Center,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
 } from "@chakra-ui/react";
 import { keyframes } from '@emotion/react';
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useRouter } from 'next/router';
-import { FiEye, FiEyeOff, FiArrowLeft, FiCheck, FiX, FiLock, FiInfo } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiArrowLeft, FiCheck, FiX, FiLock, FiInfo, FiSearch } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
 export default function Auth({ initialSpaceId = '', initialSpaceName = '', initialStep = 'enterName' }) {
@@ -38,6 +46,7 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
   const [errorMessage, setErrorMessage] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef(null);
   const toast = useToast();
   const router = useRouter();
@@ -132,8 +141,12 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
       
       // Clear password field when step changes to enter/create password
       setPassword(''); 
-      // Focus input for password after step change
-      setTimeout(() => inputRef.current?.focus(), 100); 
+      
+      // Open the modal for password entry
+      onOpen();
+      
+      // Focus input for password after modal opens
+      setTimeout(() => inputRef.current?.focus(), 300); 
 
       setIsLoading(false);
       setIsValidating(false);
@@ -280,6 +293,7 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
     setSpaceExists(false);
     setSpaceId('');
     setIsLoading(false);
+    onClose(); // Close the modal when going back to search
   };
 
   const renderBackButton = () => (
@@ -289,6 +303,7 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
         setStep('enterName'); 
         setErrorMessage(''); 
         setPassword('');
+        onClose(); // Close the modal
         // Focus back on space name input when going back
         setTimeout(() => inputRef.current?.focus(), 100); 
       }}
@@ -328,172 +343,240 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
     <Box width="100%">
       <ScaleFade initialScale={0.9} in={true}>
         <Box
-          w="100%" 
-          p={4}
-          bg={cardBgColor}
-          borderRadius="xl"
-          boxShadow="md"
-          borderWidth="1px"
-          borderColor={borderColor}
+          width="100%" 
           textAlign="center"
         >
-          {step !== 'enterName' && renderBackButton()}
-
           <VStack spacing={6} align="stretch">
-            {step === 'enterName' && (
-              <>
-                <HStack
-                  spacing={1}
-                  alignItems="center"
-                  bg={inputBgColor}
-                  borderRadius="md"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  _focusWithin={{
-                    borderColor: focusBorderColor,
-                    boxShadow: `0 0 0 1px ${focusBorderColor}`
-                  }}
-                  overflow="hidden"
-                >
-                    <Input
-                      ref={inputRef}
-                      placeholder="Enter space name"
-                      value={spaceName}
-                      onChange={(e) => setSpaceName(e.target.value)}
-                      onFocus={() => setIsInputFocused(true)}
-                      onBlur={() => setIsInputFocused(false)}
-                      border="none"
-                      _focus={{
-                        boxShadow: "none",
-                        outline: "none"
-                      }}
-                      bg="transparent"
-                      color={useColorModeValue('gray.800', 'white')}
-                      _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
-                      isDisabled={isLoading || isValidating}
-                      size="sm"
-                      flexGrow={1}
-                      pl={3}
-                      h="32px"
-                    />
-                    <Button
-                      colorScheme="teal"
-                      size="sm"
-                      onClick={() => checkSpaceExists(spaceName)}
-                      isLoading={isLoading || isValidating}
-                      loadingText={isValidating ? 'Checking' : 'Processing'}
-                      borderRadius="0"
-                      px={3}
-                      h="32px"
-                      fontWeight="500"
-                      _hover={{ bg: 'teal.600' }}
-                    >
-                      Go
-                    </Button>
-                </HStack>
-              </>
-            )}
-
-            {step === 'enterPassword' && (
-              <>
-                <Heading as="h1" size="lg" fontWeight="semibold">
-                  Join Space: "<Text as="span" color={secondaryAccentColor}>{spaceName}</Text>"
-                </Heading>
-                <Text color={subtleTextColor} fontSize="md">
-                  This space already exists. Enter the password to join.
-                </Text>
-                <InputGroup size="lg">
-                  <Input
-                    ref={inputRef} 
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    borderColor={borderColor}
-                    focusBorderColor={focusBorderColor}
-                    bg={inputBgColor}
-                    _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
-                    isDisabled={isLoading}
-                  />
-                  <InputRightElement width="4.5rem">
-                    <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)} variant="ghost">
-                      <Icon as={showPassword ? FiEyeOff : FiEye} color="gray.500" />
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-                {renderErrorMessage()} 
-                <Button 
-                  colorScheme="teal" 
-                  size="lg" 
-                  onClick={handleJoinSpace} 
-                  isLoading={isLoading}
-                  loadingText="Joining..."
-                  w="100%"
-                  boxShadow="md"
-                >
-                  Join Space
-                </Button>
-                <Text fontSize="sm" color={subtleTextColor} mt={2}>
-                  If you don't have access, try another space name.
-                </Text>
-              </>
-            )}
-
-            {step === 'createPassword' && (
-              <>
-                <Heading 
-                  as="h1" 
-                  size="lg" 
-                  fontWeight="semibold"
-                  title={`Creating New Space: "${spaceName}"`}
-                >
-                  Creating New Space: "<Text as="span" color={mainAccentColor}>{spaceName}</Text>"
-                </Heading>
-                <Text color={subtleTextColor} fontSize="md">
-                  Choose a password to secure your new space.
-                </Text>
-                <InputGroup size="lg">
-                  <Input
-                    ref={inputRef} 
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Choose a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    borderColor={borderColor}
-                    focusBorderColor={focusBorderColor}
-                    bg={inputBgColor}
-                    _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
-                    isDisabled={isLoading}
-                  />
-                  <InputRightElement width="4.5rem">
-                    <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)} variant="ghost">
-                      <Icon as={showPassword ? FiEyeOff : FiEye} color="gray.500" />
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-                {renderErrorMessage()} 
-                <Button 
-                  colorScheme="teal" 
-                  variant="solid"    
-                  size="lg" 
-                  onClick={handleCreateSpace} 
-                  isLoading={isLoading}
-                  loadingText="Creating..."
-                  w="100%"
-                  boxShadow="md"
-                >
-                  Create Space
-                </Button>
-              </>
-            )}
-            
-            {step !== 'enterName' && (
-              <Divider my={2} />
-            )}
-
+            <Flex
+              alignItems="center"
+              width="100%"
+              borderRadius="full"
+              borderWidth="1px"
+              borderColor={isInputFocused ? focusBorderColor : borderColor}
+              boxShadow={isInputFocused 
+                ? `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.3)', 'rgba(129, 230, 217, 0.3)')}` 
+                : `0 1px 2px ${useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.2)')}`
+              }
+              bg={useColorModeValue('white', 'gray.800')}
+              p="1px"
+              transition="all 0.2s ease"
+              overflow="hidden"
+              textAlign="center"
+              _hover={{
+                borderColor: useColorModeValue('gray.300', 'gray.500')
+              }}
+            >
+              <Box
+                as={motion.div}
+                initial={{ opacity: 0.7 }}
+                animate={{ opacity: 1 }}
+                pl={4}
+                color={useColorModeValue('gray.500', 'gray.400')}
+              >
+                <FiSearch size={18} />
+              </Box>
+              <Input
+                ref={inputRef}
+                placeholder="Enter space name"
+                value={spaceName}
+                onChange={(e) => setSpaceName(e.target.value)}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && spaceName.trim() && !isLoading && !isValidating) {
+                    checkSpaceExists(spaceName);
+                  }
+                }}
+                border="none"
+                _focus={{
+                  boxShadow: "none",
+                  outline: "none"
+                }}
+                bg="transparent"
+                color={useColorModeValue('gray.800', 'white')}
+                _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
+                isDisabled={isLoading || isValidating}
+                size="md"
+                flexGrow={1}
+                pl={2}
+                h="40px"
+                fontWeight="medium"
+              />
+              <Button
+                as={motion.button}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                colorScheme="teal"
+                size="sm"
+                onClick={() => checkSpaceExists(spaceName)}
+                isLoading={isLoading || isValidating}
+                loadingText={isValidating ? 'Checking' : 'Processing'}
+                borderRadius="full"
+                px={5}
+                h="36px"
+                fontWeight="500"
+                _hover={{ bg: 'teal.500' }}
+                mr={1}
+              >
+                Go
+              </Button>
+            </Flex>
           </VStack>
         </Box>
       </ScaleFade>
+      
+      {/* Password Modal */}
+      <Modal 
+        isOpen={isOpen} 
+        onClose={() => {
+          onClose();
+          setStep('enterName');
+          setErrorMessage('');
+        }}
+        isCentered
+        motionPreset="slideInBottom"
+        size="md"
+      >
+        <ModalOverlay 
+          bg={useColorModeValue('rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.6)')}
+          backdropFilter="blur(8px)"
+        />
+        <ModalContent
+          bg={cardBgColor}
+          borderRadius="xl"
+          boxShadow="xl"
+          p={4}
+        >
+          <ModalHeader p={0} mb={2}>
+            {step !== 'enterName' && renderBackButton()}
+          </ModalHeader>
+          <ModalBody p={0}>
+            <VStack spacing={6} align="stretch">
+              {step === 'enterPassword' && (
+                <>
+                  <Heading as="h1" size="lg" fontWeight="semibold" mb={1}>
+                    Join Space: "<Text as="span" color={secondaryAccentColor}>{spaceName}</Text>"
+                  </Heading>
+                  <Box
+                    p={3}
+                    bg={useColorModeValue('blue.50', 'blue.900')}
+                    borderRadius="md"
+                    borderLeftWidth="4px"
+                    borderLeftColor={secondaryAccentColor}
+                    mb={4}
+                  >
+                    <Text color={subtleTextColor} fontSize="sm" fontWeight="medium">
+                      This space already exists. Enter the password to join.
+                    </Text>
+                  </Box>
+                  <InputGroup size="lg">
+                    <Input
+                      ref={inputRef} 
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      borderColor={borderColor}
+                      focusBorderColor={focusBorderColor}
+                      bg={inputBgColor}
+                      _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
+                      isDisabled={isLoading}
+                    />
+                    <InputRightElement width="4.5rem">
+                      <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)} variant="ghost">
+                        <Icon as={showPassword ? FiEyeOff : FiEye} color="gray.500" />
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                  {renderErrorMessage()} 
+                  <Button 
+                    colorScheme="teal" 
+                    size="lg" 
+                    onClick={handleJoinSpace} 
+                    isLoading={isLoading}
+                    loadingText="Joining..."
+                    w="100%"
+                    boxShadow="md"
+                  >
+                    Join Space
+                  </Button>
+                  <Flex 
+                    mt={4} 
+                    p={2} 
+                    borderRadius="md" 
+                    bg={useColorModeValue('gray.50', 'gray.700')} 
+                    alignItems="center" 
+                    justifyContent="center"
+                  >
+                    <Icon as={FiInfo} color={subtleTextColor} mr={2} />
+                    <Text fontSize="xs" fontWeight="medium" color={subtleTextColor}>
+                      If you don't have access, try another space name.
+                    </Text>
+                  </Flex>
+                </>
+              )}
+
+              {step === 'createPassword' && (
+                <>
+                  <Heading 
+                    as="h1" 
+                    size="lg" 
+                    fontWeight="semibold"
+                    title={`Creating New Space: "${spaceName}"`}
+                    mb={1}
+                  >
+                    Creating New Space: "<Text as="span" color={mainAccentColor}>{spaceName}</Text>"
+                  </Heading>
+                  <Box
+                    p={3}
+                    bg={useColorModeValue('teal.50', 'teal.900')}
+                    borderRadius="md"
+                    borderLeftWidth="4px"
+                    borderLeftColor={mainAccentColor}
+                    mb={4}
+                  >
+                    <Text color={subtleTextColor} fontSize="sm" fontWeight="medium">
+                      Choose a password to secure your new space.
+                    </Text>
+                  </Box>
+                  <InputGroup size="lg">
+                    <Input
+                      ref={inputRef} 
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Choose a password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      borderColor={borderColor}
+                      focusBorderColor={focusBorderColor}
+                      bg={inputBgColor}
+                      _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
+                      isDisabled={isLoading}
+                    />
+                    <InputRightElement width="4.5rem">
+                      <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)} variant="ghost">
+                        <Icon as={showPassword ? FiEyeOff : FiEye} color="gray.500" />
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                  {renderErrorMessage()} 
+                  <Button 
+                    colorScheme="teal" 
+                    variant="solid"    
+                    size="lg" 
+                    onClick={handleCreateSpace} 
+                    isLoading={isLoading}
+                    loadingText="Creating..."
+                    w="100%"
+                    boxShadow="md"
+                  >
+                    Create Space
+                  </Button>
+                </>
+              )}
+            </VStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
