@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>CodeShare Platform</title>
+        <title>CodeShare</title>
         <meta name="description" content="A real-time collaborative code editing platform" />
         <meta name="viewport" content="width=1024, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />

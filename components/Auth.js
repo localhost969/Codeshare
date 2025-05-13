@@ -27,14 +27,14 @@ import { useRouter } from 'next/router';
 import { FiEye, FiEyeOff, FiArrowLeft, FiCheck, FiX, FiLock, FiInfo } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
-export default function Auth() {
-  const [spaceName, setSpaceName] = useState('');
+export default function Auth({ initialSpaceId = '', initialSpaceName = '', initialStep = 'enterName' }) {
+  const [spaceName, setSpaceName] = useState(initialSpaceName);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState('enterName'); // 'enterName', 'enterPassword', 'createPassword'
-  const [spaceExists, setSpaceExists] = useState(false);
-  const [spaceId, setSpaceId] = useState('');
+  const [step, setStep] = useState(initialStep); // 'enterName', 'enterPassword', 'createPassword'
+  const [spaceExists, setSpaceExists] = useState(!!initialSpaceId);
+  const [spaceId, setSpaceId] = useState(initialSpaceId);
   const [errorMessage, setErrorMessage] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
@@ -70,7 +70,14 @@ export default function Auth() {
   // Focus the input on mount
   useEffect(() => {
     if (inputRef.current && step === 'enterName') {
-      setTimeout(() => inputRef.current.focus(), 500);
+      const timeoutId = setTimeout(() => {
+        // Add a check here
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 500);
+      // Optional: Clear the timeout if the component unmounts or step changes
+      return () => clearTimeout(timeoutId);
     }
   }, [step]);
 

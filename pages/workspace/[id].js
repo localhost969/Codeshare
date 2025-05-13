@@ -97,30 +97,36 @@ export default function WorkspacePage() {
 
   if (isLoading) {
     return (
-      <Center height="100vh">
-        <Box textAlign="center">
-          <Spinner size="xl" mb={4} color="teal.500" />
-          <Text>Loading workspace...</Text>
-        </Box>
-      </Center>
+      <Box layerStyle="gradientBackground" minH="100vh">
+        <Center height="100vh">
+          <Box textAlign="center">
+            <Spinner size="xl" mb={4} color="teal.500" />
+            <Text>Loading workspace...</Text>
+          </Box>
+        </Center>
+      </Box>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <Center height="100vh">
-        <Box textAlign="center">
-          <Text>Authentication required</Text>
-        </Box>
-      </Center>
+      <Box layerStyle="gradientBackground" minH="100vh">
+        <Center height="100vh">
+          <Box textAlign="center">
+            <Text>Authentication required</Text>
+          </Box>
+        </Center>
+      </Box>
     );
   }
 
   return (
-    <Workspace 
-      spaceId={id} 
-      spaceName={spaceData?.name || name} 
-      onSignOut={handleSignOut} 
-    />
+    <Box layerStyle="gradientBackground" minH="100vh">
+      <Workspace 
+        spaceId={id} 
+        spaceName={spaceData?.name || name} 
+        onSignOut={handleSignOut} 
+      />
+    </Box>
   );
 }

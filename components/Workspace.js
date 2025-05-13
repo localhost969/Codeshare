@@ -2,44 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Flex, 
-  Input, 
-  Button, 
   useToast, 
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  FormControl,
-  FormLabel,
-  Text,
-  Badge,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
   useColorModeValue
 } from '@chakra-ui/react';
-import { doc, setDoc, onSnapshot, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, collection, query, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { v4 as uuidv4 } from 'uuid';
+
+// Import components
 import CodeEditor from './CodeEditor';
 import Sidebar from './Sidebar';
 import CodeRunner from './CodeRunner';
-import UserPresence from './UserPresence';
 
+// Import workspace sub-components
+import WorkspaceHeader from './workspace/WorkspaceHeader';
+import EditorPanel from './workspace/EditorPanel';
+import NewSnippetModal from './workspace/NewSnippetModal';
+import EditTitleModal from './workspace/EditTitleModal';
+import DeleteConfirmModal from './workspace/DeleteConfirmModal';
+import EmptyState from './workspace/EmptyState';
+import BrowseView from './workspace/BrowseView';
 
 const Workspace = ({ spaceId, spaceName, onSignOut }) => {
+  // State management
   const [snippets, setSnippets] = useState([]);
   const [selectedSnippetId, setSelectedSnippetId] = useState(null);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
+  const [currentView, setCurrentView] = useState('browse'); // Changed from 'empty' to 'browse'
+  
+  // Modal states
   const [isNewSnippetModalOpen, setIsNewSnippetModalOpen] = useState(false);
+  const [isEditTitleModalOpen, setIsEditTitleModalOpen] = useState(false);
+  const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false);
+  
+  // Form states
   const [newSnippetTitle, setNewSnippetTitle] = useState('');
-  const [activeUsers, setActiveUsers] = useState(1); // Static value since websockets removed
+  const [editingSnippetId, setEditingSnippetId] = useState(null);
+  const [editingSnippetTitle, setEditingSnippetTitle] = useState('');
+  const [snippetToDelete, setSnippetToDelete] = useState(null);
+  
   const toast = useToast();
 
   // Real-time collaboration removed (websockets)
@@ -63,11 +65,15 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
         console.log(`Loaded ${loadedSnippets.length} snippets`);
         setSnippets(loadedSnippets);
         
-        // Select the first snippet if none is selected
-        if (loadedSnippets.length > 0 && !selectedSnippetId) {
-          setSelectedSnippetId(loadedSnippets[0].id);
-          setCode(loadedSnippets[0].code || '');
-          setLanguage(loadedSnippets[0].language || 'javascript');
+        // Don't automatically select any snippet when user logs in
+        // If a snippet is already selected, make sure it still exists
+        if (selectedSnippetId) {
+          const snippetExists = loadedSnippets.some(s => s.id === selectedSnippetId);
+          if (!snippetExists) {
+            setSelectedSnippetId(null);
+            setCode('');
+            setLanguage('javascript');
+          }
         }
       }, (error) => {
         console.error('Error loading snippets:', error);
@@ -91,21 +97,43 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
         isClosable: true,
       });
     }
-  }, [spaceId, toast]);
+  }, [spaceId, toast, selectedSnippetId]);
 
-  // Load selected snippet
-  useEffect(() => {
-    if (selectedSnippetId) {
-      const selectedSnippet = snippets.find(s => s.id === selectedSnippetId);
+  // Load selected snippet when clicked
+  const handleSelectSnippet = (snippetId) => {
+    // Only load the snippet if it's different from the currently selected one
+    if (snippetId !== selectedSnippetId) {
+      setSelectedSnippetId(snippetId);
+      
+      // Find the snippet and load its code and language
+      const selectedSnippet = snippets.find(s => s.id === snippetId);
       if (selectedSnippet) {
-        setCode(selectedSnippet.code);
-        setLanguage(selectedSnippet.language);
+        setCode(selectedSnippet.code || '');
+        setLanguage(selectedSnippet.language || 'javascript');
+        setCurrentView('editor'); // Make sure we switch to editor view
       }
+    } else {
+      // If clicking the same snippet, still ensure we're in editor view
+      setCurrentView('editor');
     }
-  }, [selectedSnippetId, snippets]);
+  };
 
   const handleCodeChange = (value) => {
     setCode(value);
+    
+    // Only attempt language detection if current language is plaintext
+    if (language === 'plaintext' && value.length > 10) {
+      const detectedLanguage = detectLanguage(value);
+      if (detectedLanguage) {
+        setLanguage(detectedLanguage);
+        
+        // Update language in Firestore if we have a snippet selected
+        if (selectedSnippetId) {
+          const snippetRef = doc(db, 'spaces', spaceId, 'snippets', selectedSnippetId);
+          setDoc(snippetRef, { language: detectedLanguage }, { merge: true });
+        }
+      }
+    }
     
     // Save to Firestore (debounced in a real app)
     if (selectedSnippetId) {
@@ -146,6 +174,28 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
     }
   };
 
+  // Add new language detection function
+  const detectLanguage = (code) => {
+    // Simple language detection based on common patterns
+    const patterns = {
+      javascript: /(const|let|var|function|\=>|console\.log)/,
+      python: /(def|import|from|print|if __name__|#\s*coding:)/,
+      html: /(<html|<!DOCTYPE html|<div|<body|<head)/i,
+      css: /(@media|@import|{|}|\b(margin|padding|border|color):)/,
+      java: /(public class|private|protected|package|import java)/,
+      cpp: /(#include|using namespace|int main|void main|std::)/,
+      php: /(<\?php|\$_GET|\$_POST|\$_SERVER|echo)/i,
+      sql: /(SELECT|INSERT INTO|CREATE TABLE|UPDATE|DELETE FROM)/i
+    };
+
+    for (const [language, pattern] of Object.entries(patterns)) {
+      if (pattern.test(code)) {
+        return language;
+      }
+    }
+    return null; // No language detected
+  };
+
   const handleAddSnippet = async () => {
     if (!newSnippetTitle.trim()) {
       toast({
@@ -162,8 +212,8 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
     const newSnippet = {
       id: newSnippetId,
       title: newSnippetTitle,
-      code: '// Start coding here',
-      language: 'javascript',
+      code: '', // Start with empty code
+      language: 'plaintext', // Start with plaintext, will update when code is entered
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -181,9 +231,13 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
       setNewSnippetTitle('');
       setIsNewSnippetModalOpen(false);
       setSelectedSnippetId(newSnippetId);
+      setCode('');
+      setLanguage('plaintext');
+      setCurrentView('editor'); // Immediately switch to editor view
       
       toast({
         title: "Snippet created",
+        description: "Start typing to auto-detect language",
         status: "success",
         duration: 3000,
         isClosable: true,
@@ -200,23 +254,88 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
     }
   };
 
-  const handleDeleteSnippet = async (snippetId) => {
+  const handleEditSnippetTitle = () => {
+    if (!editingSnippetId || !editingSnippetTitle.trim()) {
+      toast({
+        title: "Title required",
+        description: "Please provide a title for your snippet",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    
     try {
-      console.log('Deleting snippet:', snippetId);
+      console.log('Updating snippet title:', editingSnippetId, 'to:', editingSnippetTitle);
+      
+      const snippetRef = doc(db, 'spaces', spaceId, 'snippets', editingSnippetId);
+      setDoc(snippetRef, { 
+        title: editingSnippetTitle,
+        updatedAt: new Date().toISOString() 
+      }, { merge: true });
+      
+      setIsEditTitleModalOpen(false);
+      setEditingSnippetId(null);
+      setEditingSnippetTitle('');
+      
+      toast({
+        title: "Title updated",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error updating snippet title:', error);
+      toast({
+        title: "Error updating title",
+        description: error.message || 'An unexpected error occurred',
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+  
+  const openEditTitleModal = (snippetId) => {
+    const snippet = snippets.find(s => s.id === snippetId);
+    if (snippet) {
+      setEditingSnippetId(snippetId);
+      setEditingSnippetTitle(snippet.title);
+      setIsEditTitleModalOpen(true);
+    }
+  };
+
+  const handleDeleteSnippet = async (snippetId) => {
+    // Open confirmation modal instead of deleting directly
+    setSnippetToDelete(snippetId);
+    setIsDeleteConfirmModalOpen(true);
+  };
+
+  const confirmDeleteSnippet = async () => {
+    if (!snippetToDelete) return;
+
+    try {
+      console.log('Deleting snippet:', snippetToDelete);
       
       const snippetsRef = collection(db, 'spaces', spaceId, 'snippets');
-      const snippetRef = doc(snippetsRef, snippetId);
+      const snippetRef = doc(snippetsRef, snippetToDelete);
       await deleteDoc(snippetRef);
       
       console.log('Snippet deleted successfully');
       
-      if (selectedSnippetId === snippetId) {
-        const remainingSnippets = snippets.filter(s => s.id !== snippetId);
+      if (selectedSnippetId === snippetToDelete) {
+        const remainingSnippets = snippets.filter(s => s.id !== snippetToDelete);
         if (remainingSnippets.length > 0) {
-          setSelectedSnippetId(remainingSnippets[0].id);
+          // Select the first available snippet
+          const firstSnippet = remainingSnippets[0];
+          setSelectedSnippetId(firstSnippet.id);
+          setCode(firstSnippet.code || '');
+          setLanguage(firstSnippet.language || 'javascript');
         } else {
           setSelectedSnippetId(null);
           setCode('');
+          setLanguage('javascript');
         }
       }
       
@@ -235,105 +354,94 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsDeleteConfirmModalOpen(false);
+      setSnippetToDelete(null);
     }
   };
 
+  const handleCloseEditor = () => {
+    setSelectedSnippetId(null);
+    setCode('');
+    setLanguage('javascript');
+    setCurrentView('browse'); // Changed from 'empty' to 'browse'
+  };
+  
+  const handleOpenBrowseView = () => {
+    setCurrentView('browse');
+  };
+  
+  // Remove handleOpenEmptyState as it's no longer needed
+
   return (
-    <Flex height="100vh">
-      <Sidebar 
-        snippets={snippets}
-        selectedSnippetId={selectedSnippetId}
-        onSelectSnippet={setSelectedSnippetId}
-        onAddSnippet={() => setIsNewSnippetModalOpen(true)}
-        onDeleteSnippet={handleDeleteSnippet}
-        spaceId={spaceId}
-        spaceName={spaceName}
+    <Flex height="100vh" direction="column">
+      {/* Main workspace layout */}
+      <Flex flex="1" overflow="hidden">
+        {/* Sidebar */}
+        <Sidebar 
+          snippets={snippets}
+          selectedSnippetId={selectedSnippetId}
+          onSelectSnippet={handleSelectSnippet}
+          onAddSnippet={() => setIsNewSnippetModalOpen(true)}
+          onDeleteSnippet={handleDeleteSnippet}
+          onEditTitle={openEditTitleModal}
+          spaceId={spaceId}
+          spaceName={spaceName}
+        />
+        
+        {/* Main content area */}
+        <Flex flex="1" direction="column" overflow="hidden">
+          {/* Header with workspace controls */}
+          <WorkspaceHeader 
+            title={selectedSnippetId ? snippets.find(s => s.id === selectedSnippetId)?.title : ''}
+            hasActiveSnippet={!!selectedSnippetId}
+            onCloseEditor={handleCloseEditor}
+            onSignOut={onSignOut}
+          />
+          
+          {/* Main content area: Editor or Browse View */}
+          {currentView === 'editor' && selectedSnippetId ? (
+            <EditorPanel 
+              code={code}
+              language={language}
+              onChange={handleCodeChange}
+              onLanguageChange={handleLanguageChange}
+              lastEditedTime={snippets.find(s => s.id === selectedSnippetId)?.updatedAt}
+            />
+          ) : (
+            <BrowseView 
+              snippets={snippets} 
+              onSelectSnippet={handleSelectSnippet}
+              onAddSnippet={() => setIsNewSnippetModalOpen(true)}
+              onEditTitle={openEditTitleModal}
+              onDeleteSnippet={handleDeleteSnippet}
+            />
+          )}
+        </Flex>
+      </Flex>
+      
+      {/* Modals */}
+      <NewSnippetModal 
+        isOpen={isNewSnippetModalOpen}
+        onClose={() => setIsNewSnippetModalOpen(false)}
+        title={newSnippetTitle}
+        onTitleChange={(e) => setNewSnippetTitle(e.target.value)}
+        onSubmit={handleAddSnippet}
       />
       
-      <Box flex="1" p={4} overflowY="auto">
-        <Flex justify="space-between" align="center" mb={4}>
-          <Text fontSize="lg" fontWeight="bold">
-            {selectedSnippetId ? snippets.find(s => s.id === selectedSnippetId)?.title : 'No snippet selected'}
-          </Text>
-          <Flex align="center">
-            <UserPresence activeUsers={activeUsers} />
-            <Button colorScheme="red" size="sm" onClick={onSignOut} ml={3}>
-              Exit Space
-            </Button>
-          </Flex>
-        </Flex>
-        
-        {selectedSnippetId ? (
-          <Tabs variant="soft-rounded" colorScheme="teal">
-            <TabList>
-              <Tab>Code Editor</Tab>
-              <Tab>Run Code</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel px={0} pt={4}>
-                <CodeEditor 
-                  value={code} 
-                  onChange={handleCodeChange} 
-                  language={language}
-                  onLanguageChange={handleLanguageChange}
-                />
-              </TabPanel>
-              <TabPanel px={0} pt={4}>
-                <Box mb={4}>
-                  <CodeEditor 
-                    value={code} 
-                    onChange={handleCodeChange} 
-                    language={language}
-                    onLanguageChange={handleLanguageChange}
-                  />
-                </Box>
-                <CodeRunner code={code} language={language} />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        ) : (
-          <Box 
-            height="300px" 
-            borderWidth="1px" 
-            borderRadius="lg" 
-            display="flex" 
-            justifyContent="center" 
-            alignItems="center"
-            bg={useColorModeValue('gray.50', 'gray.700')}
-          >
-            <Text color="gray.500">
-              Select a snippet or create a new one to start coding
-            </Text>
-          </Box>
-        )}
-      </Box>
-      
-      {/* New Snippet Modal */}
-      <Modal isOpen={isNewSnippetModalOpen} onClose={() => setIsNewSnippetModalOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Create New Snippet</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Snippet Title</FormLabel>
-              <Input 
-                value={newSnippetTitle} 
-                onChange={(e) => setNewSnippetTitle(e.target.value)}
-                placeholder="Enter a title for your snippet"
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={() => setIsNewSnippetModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue" onClick={handleAddSnippet}>
-              Create
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <EditTitleModal 
+        isOpen={isEditTitleModalOpen}
+        onClose={() => setIsEditTitleModalOpen(false)}
+        title={editingSnippetTitle}
+        onTitleChange={(e) => setEditingSnippetTitle(e.target.value)}
+        onSubmit={handleEditSnippetTitle}
+      />
+
+      <DeleteConfirmModal 
+        isOpen={isDeleteConfirmModalOpen}
+        onClose={() => setIsDeleteConfirmModalOpen(false)}
+        onConfirm={confirmDeleteSnippet}
+      />
     </Flex>
   );
 };
