@@ -32,74 +32,28 @@ export default function Footer() {
   const router = useRouter();
   const isIndexPage = router.pathname === '/';
   const { colorMode, toggleColorMode } = useColorMode();
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [isVisible, setIsVisible] = useState(!isIndexPage);
-  const [isHovered, setIsHovered] = useState(false);
-  const scrollTimeout = useRef();
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !isIndexPage) return;
-
-    const handleScroll = () => {
-      // Show footer when scrolling starts
-      if (!isScrolling) {
-        setIsScrolling(true);
-        setIsVisible(true);
-      }
-
-      // Clear any existing timeout
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
-
-      // Set a timeout to hide the footer after scrolling stops
-      scrollTimeout.current = setTimeout(() => {
-        setIsScrolling(false);
-        setIsVisible(false);
-      }, 1000); // 1 second delay after scrolling stops
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [isIndexPage, isScrolling]);
-
-  // Always show on non-index pages
-  useEffect(() => {
-    if (!isIndexPage) {
-      setIsVisible(true);
-    }
-  }, [isIndexPage]);
-
-  const footerStyle = {
-    transform: isHovered || isVisible ? 'translateY(0)' : 'translateY(100%)',
-    transition: 'transform 0.3s ease-in-out',
-  };
+  // Remove scroll and hover effects for always-visible footer
 
   return (
     <Box 
       as="footer"
       bg={useColorModeValue('white', 'gray.800')} 
       color={useColorModeValue('gray.600', 'gray.300')}
-      height="28px"
+      height="24px"
+      py={1}
       borderTop="1px"
       borderColor={borderColor}
       width="100%"
-      position="fixed"
+      position="sticky"
       bottom="0"
       left="0"
       right="0"
       zIndex="sticky"
       boxShadow="sm"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={isIndexPage ? footerStyle : {}}
+      mt="auto"
+      // Remove hover and scroll effects
     >
-      <Container maxW="container.xl" height="100%" px={4}>
+      <Container maxW="container.xl" height="100%" px={4} py={0}>
         <Flex 
           direction="row"
           justify="center"   
@@ -108,44 +62,29 @@ export default function Footer() {
           maxW="100%"
         >
           <Flex flex="1" justify="center" align="center">
-            <Text 
+            <Text
               fontSize="xs"
-              color={subtleText} 
+              lineHeight="shorter"
+              color={subtleText}
               fontWeight="medium"
               textAlign="center"
               alignItems="center"
-              display="inline-flex"
+              display="flex"
+              justifyContent="center"
+              width="100%"
             >
-              <Box 
+              &copy; {new Date().getFullYear()} Codeshare. All rights reserved. | Crafted by{' '}
+              <Box
                 as="span"
+                color={accentColor}
+                fontWeight="bold"
                 fontFamily="heading"
-                fontWeight="medium"
-                fontSize="sm"
-                letterSpacing="tight"
-                color={useColorModeValue('gray.600', 'gray.300')}
+                px={1}
+                borderBottom="2px solid"
+                borderColor={accentColor}
+                ml={1}
               >
-                Crafted by{' '}
-                <Box 
-                  as="span" 
-                  color={accentColor}
-                  position="relative"
-                  _after={{
-                    content: '""',
-                    position: 'absolute',
-                    bottom: '0',
-                    left: 0,
-                    width: '100%',
-                    height: '1px',
-                    bg: accentColor,
-                    opacity: 0.8,
-                    transition: 'opacity 0.2s ease',
-                    _hover: {
-                      opacity: 1
-                    }
-                  }}
-                >
-                  Vardan
-                </Box>
+                Vardan
               </Box>
             </Text>
           </Flex>
@@ -184,7 +123,6 @@ export default function Footer() {
                   right="100%"
                   bottom="100%"
                   mb={2}
-                  transform={isOpen ? 'translateX(0)' : 'translateX(10px)'}
                   opacity={isOpen ? 1 : 0}
                   transition="all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
                   pointerEvents={isOpen ? 'auto' : 'none'}
