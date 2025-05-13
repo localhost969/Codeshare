@@ -301,6 +301,7 @@ const CodeRunner = ({ code, language }) => {
   const errorColor = useColorModeValue('red.500', 'red.300');
   const warningColor = useColorModeValue('yellow.500', 'yellow.300');
   const infoColor = useColorModeValue('blue.500', 'blue.300');
+  const headerBgColor = useColorModeValue('gray.100', 'gray.700');
   
   useEffect(() => {
     // Scroll to the bottom of terminal when output changes
@@ -427,8 +428,9 @@ const CodeRunner = ({ code, language }) => {
     >
       <Flex 
         p={3} 
-        bg="gray.100" 
+        bg={headerBgColor}
         borderBottomWidth="1px" 
+        borderColor={borderColor}
         justify="space-between" 
         align="center"
       >

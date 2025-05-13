@@ -1,4 +1,5 @@
-import { keyframes } from '@emotion/react';import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { keyframes } from '@emotion/react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Box, 
   Heading, 
@@ -7,7 +8,8 @@ import {
   Text, 
   Flex, 
   Badge, 
-  useColorModeValue, 
+  useColorModeValue,
+  useColorMode, 
   Input, 
   InputGroup, 
   InputRightElement,
@@ -130,11 +132,26 @@ const getLanguageIcon = (lang) => {
 // Custom components
 const SnippetCard = ({ snippet, onSelect, viewMode, onEditTitle, onDeleteSnippet }) => {
   const { id, title, code, language, updatedAt, createdAt } = snippet;
+  const { colorMode } = useColorMode();
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.300');
   const accentColor = useColorModeValue('teal.500', 'teal.300');
   const hoverBg = useColorModeValue('gray.50', 'gray.700');
+  
+  // Enhanced dark mode styling for cards
+  const cardStyles = colorMode === 'dark' ? {
+    bg: 'gray.800',
+    borderColor: 'gray.700',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+    _hover: {
+      bg: 'gray.750',
+      borderColor: 'teal.300',
+      boxShadow: '0 5px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(49, 151, 149, 0.2)'
+    }
+  } : {
+    _hover: { bg: hoverBg, borderColor: 'teal.300' }
+  };
   
   // Format date
   const formatDate = (dateString) => {
@@ -171,13 +188,13 @@ const SnippetCard = ({ snippet, onSelect, viewMode, onEditTitle, onDeleteSnippet
           borderRadius="md"
           borderColor={borderColor}
           bg={cardBg}
-          _hover={{ bg: hoverBg, borderColor: 'teal.300' }}
           cursor="pointer"
           onClick={() => onSelect(id)}
-          boxShadow="sm"
+          boxShadow={colorMode === 'dark' ? 'dark-lg' : 'sm'}
           transition="all 0.2s"
           align="center"
           justify="space-between"
+          {...cardStyles}
         >
           <HStack spacing={3} overflow="hidden">
             <Icon as={getLanguageIcon(language)} color={accentColor} boxSize={5} flexShrink={0} />
@@ -604,6 +621,7 @@ const SortMenu = ({ sortOrder, setSortOrder }) => {
 };
 
 const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDeleteSnippet }) => {
+  const { colorMode } = useColorMode();
   // State management
   const [filteredSnippets, setFilteredSnippets] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -639,13 +657,20 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
   }, [searchQuery]);
 
   // Theme colors
-  const cardBg = useColorModeValue('white', 'gray.800');
+  const bgColor = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const accentColor = useColorModeValue('teal.500', 'teal.300');
-  const textColor = useColorModeValue('gray.600', 'gray.300');
-  const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const headerBg = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.600', 'gray.400');
+  const headingColor = useColorModeValue('gray.700', 'white');
   const sectionBg = useColorModeValue('white', 'gray.800');
+
+  // Enhanced dark mode styling
+  const browseViewStyles = colorMode === 'dark' ? {
+    bg: 'gray.900',
+    backgroundImage: 'linear-gradient(to bottom right, rgba(49, 151, 149, 0.05), rgba(72, 87, 153, 0.05))',
+    boxShadow: 'inset 0 0 15px rgba(0, 0, 0, 0.4)',
+    borderColor: 'gray.700',
+  } : {};
 
   // Get all available languages for filtering
   const availableLanguages = useMemo(() => {
@@ -779,6 +804,7 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
       display="flex"
       flexDirection="column"
       bg={bgColor}
+      {...browseViewStyles}
     >
       {/* Header with search and actions */}
       <Box 
@@ -786,7 +812,7 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
         px={6} 
         borderBottomWidth="1px" 
         borderColor={borderColor}
-        bg={headerBg}
+        bg={sectionBg}
         position="sticky"
         top={0}
         zIndex={10}

@@ -5,6 +5,7 @@ import {
   Text, 
   HStack,
   Container,
+  SimpleGrid,
   Flex,
   Icon,
   useColorModeValue,
@@ -14,65 +15,42 @@ import {
 import { motion, isValidMotionProp } from 'framer-motion';
 import { FiCode, FiTerminal, FiGitMerge, FiLock, FiZap } from 'react-icons/fi';
 
-// Create a custom motion component with Chakra UI
 const ChakraBox = chakra(motion.div, {
   shouldForwardProp: (prop) => isValidMotionProp(prop) || shouldForwardProp(prop),
 });
 
 export default function Features() {
-  const cardBg = useColorModeValue('white', 'gray.800');
   const accentColor = useColorModeValue('teal.500', 'teal.300');
   const secondaryColor = useColorModeValue('blue.500', 'blue.300');
   const subtleText = useColorModeValue('gray.600', 'gray.400');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   const features = [
     { 
       icon: FiCode, 
       title: "Multiple Snippets", 
-      description: "Store and organize multiple code snippets in one place."
+      description: "Store and organize code snippets efficiently."
     },
     { 
       icon: FiTerminal, 
       title: "Syntax Highlighting", 
-      description: "Beautiful syntax highlighting for all major programming languages."
+      description: "Supports all major programming languages."
     },
     { 
       icon: FiGitMerge, 
       title: "Real-time Sharing", 
-      description: "Share your snippets with others instantly in real-time."
+      description: "Instant collaboration with others."
     },
     { 
       icon: FiLock, 
-      title: "Secure Access", 
-      description: "Password-protected spaces for private code sharing."
-    },
-    { 
-      icon: FiZap, 
-      title: "Instant Access", 
-      description: "No account required. Create and share in seconds."
-    },
-    { 
-      icon: FiTerminal, 
-      title: "Simple Interface", 
-      description: "Clean, distraction-free interface focused on your code."
+      title: "Secure", 
+      description: "Password protection for private sharing."
     }
   ];
 
   return (
-    <Box 
-      position="relative" 
-      py={20} 
-    >
-      <Container maxW="container.xl" position="relative" zIndex={1}>
-        <ChakraBox
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          textAlign="center"
-          mb={8}
-        >
+    <Box py={16}>
+      <Container maxW="container.lg">
+        <Box textAlign="center" mb={12}>
           <Heading 
             as="h2" 
             size="lg" 
@@ -82,57 +60,48 @@ export default function Features() {
           >
             Features
           </Heading>
-          <Text fontSize="md" color={subtleText} maxW="700px" mx="auto">
-            CodeShare offers everything you need for seamless collaboration
+          <Text color={subtleText} maxW="600px" mx="auto">
+            Everything you need for seamless code sharing
           </Text>
-        </ChakraBox>
+        </Box>
         
-        <Flex 
-          wrap="wrap" 
-          justify="center"
-          mx="-8px"
-        >
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={4}>
           {features.map((feature, index) => (
             <ChakraBox
               key={index}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               viewport={{ once: true }}
-              w={{ base: "100%", sm: "50%", md: "33.33%" }}
-              px={2}
-              mb={4}
             >
               <HStack 
-                bg={cardBg} 
-                p={4} 
-                borderRadius="lg" 
-                boxShadow="sm"
-                border="1px solid"
-                borderColor={borderColor}
-                h="100%"
+                p={4}
+                bg={useColorModeValue('white', 'gray.800')}
+                borderRadius="lg"
+                borderWidth="1px"
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
                 spacing={3}
+                h="100%"
                 align="flex-start"
                 _hover={{
-                  borderColor: accentColor,
-                  boxShadow: 'md',
-                  transform: 'translateY(-2px)',
-                  transition: 'all 0.2s ease'
+                  borderColor: index % 2 === 0 ? accentColor : secondaryColor,
+                  shadow: 'md'
                 }}
+                transition="all 0.2s"
               >
                 <Flex 
                   align="center" 
                   justify="center" 
-                  minW={10} 
-                  h={10} 
-                  borderRadius="md" 
-                  bg={useColorModeValue('teal.50', 'teal.900')} 
-                  color={accentColor}
+                  w={10}
+                  h={10}
+                  borderRadius="lg" 
+                  bg={index % 2 === 0 ? `${accentColor}100` : `${secondaryColor}100`}
+                  color={index % 2 === 0 ? accentColor : secondaryColor}
                 >
-                  <Icon as={feature.icon} boxSize={4} />
+                  <Icon as={feature.icon} boxSize={5} />
                 </Flex>
                 <Box>
-                  <Heading as="h3" size="sm" mb={1} fontWeight="600">
+                  <Heading as="h3" size="sm" mb={1} color={useColorModeValue('gray.800', 'white')}>
                     {feature.title}
                   </Heading>
                   <Text color={subtleText} fontSize="sm">
@@ -142,7 +111,7 @@ export default function Features() {
               </HStack>
             </ChakraBox>
           ))}
-        </Flex>
+        </SimpleGrid>
       </Container>
     </Box>
   );

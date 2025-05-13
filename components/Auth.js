@@ -26,7 +26,8 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure
+  useDisclosure,
+  Spinner
 } from "@chakra-ui/react";
 import { keyframes } from '@emotion/react';
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
@@ -109,7 +110,7 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
       const generatedSpaceId = name.trim().toLowerCase().replace(/\s+/g, '-');
       setSpaceId(generatedSpaceId);
       
-      // Check if space exists 
+      // Check if space exists
       const spacesRef = collection(db, 'spaces');
       const spaceRef = doc(spacesRef, generatedSpaceId);
       const spaceDoc = await getDoc(spaceRef);
@@ -342,35 +343,51 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
   return (
     <Box width="100%">
       <ScaleFade initialScale={0.9} in={true}>
-        <Box
-          width="100%" 
-          textAlign="center"
-        >
-          <VStack spacing={6} align="stretch">
+        <Box width="100%" textAlign="center">
+          <VStack spacing={4} align="center">
             <Flex
+              as="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (spaceName.trim() && !isLoading && !isValidating) {
+                  checkSpaceExists(spaceName);
+                }
+              }}
               alignItems="center"
-              width="100%"
+              width={['100%', '100%', '400px']}
+              maxW="100%"
+              mx="auto"
               borderRadius="full"
               borderWidth="1px"
-              borderColor={isInputFocused ? focusBorderColor : borderColor}
+              borderColor={isInputFocused 
+                ? focusBorderColor 
+                : useColorModeValue('gray.200', 'gray.600')}
               boxShadow={isInputFocused 
-                ? `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.3)', 'rgba(129, 230, 217, 0.3)')}` 
-                : `0 1px 2px ${useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.2)')}`
+                ? `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.25)', 'rgba(129, 230, 217, 0.3)')},
+                  0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`
+                : 'sm'
               }
               bg={useColorModeValue('white', 'gray.800')}
-              p="1px"
-              transition="all 0.2s ease"
-              overflow="hidden"
-              textAlign="center"
+              transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+              px={1.5}
+              py={0.5}
               _hover={{
-                borderColor: useColorModeValue('gray.300', 'gray.500')
+                borderColor: isInputFocused ? focusBorderColor : useColorModeValue('gray.300', 'gray.500'),
+                boxShadow: `0 0 0 1px ${useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')},
+                            0 4px 12px -2px ${useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0.3)')},
+                            0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.15)', 'rgba(129, 230, 217, 0.15)')}`
+              }}
+              _focusWithin={{
+                borderColor: focusBorderColor,
+                boxShadow: `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.25)', 'rgba(129, 230, 217, 0.3)')},
+                            0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`
               }}
             >
               <Box
                 as={motion.div}
                 initial={{ opacity: 0.7 }}
                 animate={{ opacity: 1 }}
-                pl={4}
+                px={3}
                 color={useColorModeValue('gray.500', 'gray.400')}
               >
                 <FiSearch size={18} />
@@ -389,34 +406,68 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
                 }}
                 border="none"
                 _focus={{
-                  boxShadow: "none",
-                  outline: "none"
+                  boxShadow: 'none',
+                  outline: 'none'
                 }}
                 bg="transparent"
                 color={useColorModeValue('gray.800', 'white')}
-                _placeholder={{ color: useColorModeValue('gray.400', 'gray.500') }}
+                _placeholder={{ 
+                  color: useColorModeValue('gray.400', 'gray.500'),
+                  fontSize: 'sm',
+                  fontWeight: 'normal',
+                  opacity: 0.8
+                }}
                 isDisabled={isLoading || isValidating}
                 size="md"
                 flexGrow={1}
-                pl={2}
+                px={2}
+                py={4}
+                fontSize="sm"
                 h="40px"
                 fontWeight="medium"
               />
               <Button
                 as={motion.button}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
                 colorScheme="teal"
-                size="sm"
-                onClick={() => checkSpaceExists(spaceName)}
                 isLoading={isLoading || isValidating}
-                loadingText={isValidating ? 'Checking' : 'Processing'}
+                loadingText="" // Empty text since we're using a custom spinner
+                size="sm"
                 borderRadius="full"
-                px={5}
-                h="36px"
-                fontWeight="500"
-                _hover={{ bg: 'teal.500' }}
-                mr={1}
+                px={4}
+                mx={0.5}
+                my={0.5}
+                height="32px"
+                minW="70px"
+                _hover={{
+                  bg: 'teal.600',
+                  transform: 'none',
+                  boxShadow: `0 0 0 1px ${useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')},
+                            0 4px 12px -2px ${useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0.3)')},
+                            0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`
+                }}
+                _active={{
+                  bg: 'teal.700',
+                  transform: 'scale(0.96)'
+                }}
+                _focusVisible={{
+                  boxShadow: `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.3)', 'rgba(129, 230, 217, 0.3)')},
+                              0 0 0 4px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`,
+                  outline: 'none'
+                }}
+                transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                spinnerPlacement="start"
+                spinner={
+                  <Spinner 
+                    size="sm" 
+                    color="white"
+                    thickness="2px"
+                    speed="0.8s"
+                    emptyColor="whiteAlpha.500"
+                  />
+                }
               >
                 Go
               </Button>

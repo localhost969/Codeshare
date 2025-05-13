@@ -6,6 +6,7 @@ import {
   Button, 
   Input, 
   useColorModeValue,
+  useColorMode,
   Divider,
   Text,
   Flex,
@@ -124,10 +125,18 @@ const Sidebar = ({
   const currentPasswordRef = useRef(null);
   
   // Styling
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const headerBgColor = useColorModeValue('gray.50', 'gray.900');
   const accentColor = useColorModeValue('teal.500', 'teal.300');
+  
+  // Enhanced dark mode styling
+  const sidebarBg = useColorModeValue('white', 'gray.800');
+  const sidebarGradient = colorMode === 'dark' ? {
+    bgGradient: 'linear(to-b, gray.800, gray.900)',
+    boxShadow: 'inset -1px 0 0 0 rgba(255, 255, 255, 0.1)',
+  } : {};
   
   // Filter and sort snippets
   const filteredSnippets = snippets
@@ -163,10 +172,12 @@ const Sidebar = ({
         direction="column"
         width="280px" 
         height="100vh" 
-        bg={bgColor} 
+        bg={sidebarBg} 
         borderRightWidth="1px"
         borderColor={borderColor}
         overflow="hidden"
+        {...sidebarGradient}
+        transition="all 0.2s"
       >
       {/* Header */}
       <Box 
@@ -174,9 +185,21 @@ const Sidebar = ({
         bg={headerBgColor} 
         borderBottomWidth="1px" 
         borderColor={borderColor}
+        bgGradient={colorMode === 'dark' ? 'linear(to-r, gray.800, gray.850)' : 'none'}
+        boxShadow={colorMode === 'dark' ? 'inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)' : 'none'}
       >
         <Flex justify="space-between" align="center" mb={3}>
-          <Heading size="md" fontWeight="bold" color={accentColor}>CodeShare</Heading>
+          <Heading 
+            size="md" 
+            fontWeight="bold" 
+            color={accentColor}
+            textShadow={colorMode === 'dark' ? '0 0 8px rgba(49, 151, 149, 0.4)' : 'none'}
+            letterSpacing="tight"
+            bgGradient={colorMode === 'dark' ? 'linear(to-r, teal.300, blue.300)' : 'none'}
+            bgClip={colorMode === 'dark' ? 'text' : 'none'}
+          >
+            CodeShare
+          </Heading>
           <HStack spacing={1}>
             <Tooltip label="Share workspace" placement="top">
               <IconButton
@@ -184,6 +207,13 @@ const Sidebar = ({
                 variant="ghost"
                 size="sm"
                 aria-label="Share workspace"
+                color={colorMode === 'dark' ? 'teal.200' : undefined}
+                _hover={{
+                  bg: colorMode === 'dark' ? 'rgba(49, 151, 149, 0.2)' : undefined,
+                  color: colorMode === 'dark' ? 'teal.100' : undefined,
+                  transform: 'scale(1.05)'
+                }}
+                transition="all 0.2s"
                 onClick={onOpenInviteModal}
               />
             </Tooltip>
@@ -193,6 +223,13 @@ const Sidebar = ({
                 variant="ghost"
                 size="sm"
                 aria-label="Password settings"
+                color={colorMode === 'dark' ? 'teal.200' : undefined}
+                _hover={{
+                  bg: colorMode === 'dark' ? 'rgba(49, 151, 149, 0.2)' : undefined,
+                  color: colorMode === 'dark' ? 'teal.100' : undefined,
+                  transform: 'scale(1.05)'
+                }}
+                transition="all 0.2s"
                 onClick={handleOpenPasswordModal}
               />
             </Tooltip>

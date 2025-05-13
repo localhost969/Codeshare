@@ -5,6 +5,7 @@ import {
   IconButton,
   Tooltip,
   useColorModeValue,
+  useColorMode,
   HStack,
   Box,
   Badge
@@ -17,10 +18,19 @@ const WorkspaceHeader = ({
   onCloseEditor, 
   onSignOut
 }) => {
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.100', 'gray.700');
   const textColor = useColorModeValue('gray.700', 'gray.200');
   const subtleTextColor = useColorModeValue('gray.500', 'gray.400');
+  
+  // Enhanced dark mode styling
+  const headerStyles = colorMode === 'dark' ? {
+    bg: 'gray.800',
+    borderColor: 'gray.700',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
+    backgroundImage: 'linear-gradient(to right, rgba(49, 151, 149, 0.05), rgba(72, 87, 153, 0.05))',
+  } : {};
   
   return (
     <Box 
@@ -33,20 +43,22 @@ const WorkspaceHeader = ({
       bg={bgColor}
       borderBottomWidth="1px"
       borderColor={borderColor}
-      boxShadow="sm"
+      boxShadow={colorMode === 'dark' ? 'md' : 'sm'}
       transition="all 0.2s"
+      {...headerStyles}
     >
       <Flex justify="space-between" align="center" h="100%">
         <Flex align="center" minW={0}>
           {hasActiveSnippet ? (
             <HStack spacing={3}>
               <Badge 
-                colorScheme="blue" 
-                variant="subtle"
+                colorScheme="teal" 
+                variant={colorMode === 'dark' ? 'solid' : 'subtle'}
                 fontSize="xs"
                 py={1}
                 px={2}
                 borderRadius="md"
+                boxShadow={colorMode === 'dark' ? '0 0 5px rgba(49, 151, 149, 0.5)' : 'none'}
               >
                 EDITING
               </Badge>
@@ -78,8 +90,13 @@ const WorkspaceHeader = ({
                 aria-label="Close editor"
                 size="sm"
                 variant="ghost"
-                color={textColor}
-                _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
+                color={colorMode === 'dark' ? 'teal.200' : textColor}
+                _hover={{ 
+                  bg: useColorModeValue('gray.100', 'gray.700'),
+                  color: colorMode === 'dark' ? 'teal.100' : 'teal.600',
+                  transform: 'scale(1.05)'
+                }}
+                transition="all 0.2s"
                 onClick={onCloseEditor}
               />
             </Tooltip>
@@ -91,8 +108,13 @@ const WorkspaceHeader = ({
               aria-label="Sign out"
               size="sm"
               variant="ghost"
-              color={textColor}
-              _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
+              color={colorMode === 'dark' ? 'teal.200' : textColor}
+              _hover={{ 
+                bg: useColorModeValue('gray.100', 'gray.700'),
+                color: colorMode === 'dark' ? 'teal.100' : 'teal.600',
+                transform: 'scale(1.05)'
+              }}
+              transition="all 0.2s"
               onClick={onSignOut}
             />
           </Tooltip>

@@ -3,7 +3,8 @@ import {
   Box, 
   Flex, 
   useToast, 
-  useColorModeValue
+  useColorModeValue,
+  useColorMode
 } from '@chakra-ui/react';
 import { doc, setDoc, onSnapshot, collection, query, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -24,6 +25,8 @@ import EmptyState from './workspace/EmptyState';
 import BrowseView from './workspace/BrowseView';
 
 const Workspace = ({ spaceId, spaceName, onSignOut }) => {
+  // Get color mode to apply custom dark mode styling
+  const { colorMode } = useColorMode();
   // State management
   const [snippets, setSnippets] = useState([]);
   const [selectedSnippetId, setSelectedSnippetId] = useState(null);
@@ -373,10 +376,36 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
   
   // Remove handleOpenEmptyState as it's no longer needed
 
+  // Custom workspace styling for dark mode
+  const workspaceBg = useColorModeValue('white', 'gray.900');
+  const workspaceBorderColor = useColorModeValue('gray.200', 'gray.700');
+  const workspaceAccent = useColorModeValue('teal.500', 'teal.300');
+  
+  // Custom workspace styles for dark mode
+  const customDarkModeBg = colorMode === 'dark' ? {
+    bg: 'gray.900',
+    boxShadow: 'inset 0 0 15px rgba(0, 0, 0, 0.4)',
+    borderColor: 'gray.700',
+    backgroundImage: 'linear-gradient(to bottom right, rgba(49, 151, 149, 0.06), rgba(72, 87, 153, 0.06))',
+  } : {};
+
   return (
-    <Flex height="100vh" direction="column">
+    <Flex 
+      height="100vh" 
+      direction="column"
+      bg={workspaceBg}
+      {...customDarkModeBg}
+    >
       {/* Main workspace layout */}
-      <Flex flex="1" overflow="hidden">
+      <Flex 
+        flex="1" 
+        overflow="hidden"
+        borderRadius="md"
+        borderWidth={colorMode === 'dark' ? '1px' : '0'}
+        borderColor={workspaceBorderColor}
+        boxShadow={colorMode === 'dark' ? 'lg' : 'none'}
+        m={colorMode === 'dark' ? 1 : 0}
+      >
         {/* Sidebar */}
         <Sidebar 
           snippets={snippets}

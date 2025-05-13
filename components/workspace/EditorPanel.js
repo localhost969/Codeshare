@@ -7,20 +7,36 @@ import {
   Tab,
   TabPanel,
   useColorModeValue,
+  useColorMode,
   Flex
 } from '@chakra-ui/react';
 import CodeEditor from '../CodeEditor';
 import CodeRunner from '../CodeRunner';
 
 const EditorPanel = ({ code, language, onChange, onLanguageChange, lastEditedTime }) => {
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue('white', 'gray.800');
   
+  // Enhanced dark mode styling
+  const editorBg = useColorModeValue('white', 'gray.800');
+  const editorBorderColor = useColorModeValue('gray.200', 'gray.700');
+  const customEditorStyles = colorMode === 'dark' ? {
+    bg: 'gray.800',
+    borderRadius: 'md',
+    borderWidth: '1px',
+    borderColor: 'gray.700',
+    boxShadow: 'dark-lg',
+    backgroundImage: 'linear-gradient(to bottom, rgba(66, 153, 225, 0.05), rgba(49, 151, 149, 0.05))',
+  } : {};
+
   return (
     <Box 
       flex="1" 
       p={4} 
       overflowY="auto" 
-      bg={bgColor}
+      bg={editorBg}
+      {...customEditorStyles}
+      transition="all 0.3s ease"
     >
       <Tabs 
         variant="soft-rounded" 
@@ -28,14 +44,20 @@ const EditorPanel = ({ code, language, onChange, onLanguageChange, lastEditedTim
         size="md" 
         isFitted
         isLazy
+        borderRadius="lg"
+        overflow="hidden"
       >
         <TabList mb={4}>
           <Tab 
             fontWeight="medium" 
             _selected={{ 
-              color: 'teal.500', 
+              color: colorMode === 'dark' ? 'teal.200' : 'teal.500', 
               bg: useColorModeValue('teal.50', 'rgba(48, 140, 122, 0.3)'),
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              boxShadow: colorMode === 'dark' ? '0 0 10px rgba(72, 187, 120, 0.3)' : 'none'
+            }}
+            _hover={{
+              bg: colorMode === 'dark' ? 'rgba(48, 140, 122, 0.15)' : 'teal.50'
             }}
           >
             Code Editor
@@ -43,9 +65,13 @@ const EditorPanel = ({ code, language, onChange, onLanguageChange, lastEditedTim
           <Tab 
             fontWeight="medium"
             _selected={{ 
-              color: 'teal.500', 
+              color: colorMode === 'dark' ? 'teal.200' : 'teal.500', 
               bg: useColorModeValue('teal.50', 'rgba(48, 140, 122, 0.3)'),
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              boxShadow: colorMode === 'dark' ? '0 0 10px rgba(72, 187, 120, 0.3)' : 'none'
+            }}
+            _hover={{
+              bg: colorMode === 'dark' ? 'rgba(48, 140, 122, 0.15)' : 'teal.50'
             }}
           >
             Run Code
