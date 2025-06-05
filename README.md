@@ -1,6 +1,10 @@
-# CodeShare Platform
+# CodeShare
+
+![image](https://github.com/user-attachments/assets/2f7b08f2-bebb-42fe-84ec-3d5600b3fff1)
 
 A real-time collaborative code editing platform built with Next.js, Chakra UI, and Firebase. This platform allows multiple users to create and join code spaces, edit code together in real-time, and run code snippets in various programming languages.
+
+
 
 ## Features
 
