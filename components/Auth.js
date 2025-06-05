@@ -344,7 +344,7 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
     <Box width="100%">
       <ScaleFade initialScale={0.9} in={true}>
         <Box width="100%" textAlign="center">
-          <VStack spacing={4} align="center">
+          <VStack spacing={3} align="center">
             <Flex
               as="form"
               onSubmit={(e) => {
@@ -354,47 +354,40 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
                 }
               }}
               alignItems="center"
-              width={['100%', '100%', '400px']}
-              maxW="100%"
+              width="100%"
+              maxW="500px"
               mx="auto"
-              borderRadius="full"
-              borderWidth="1px"
+              borderRadius="lg"
+              borderWidth="2px"
               borderColor={isInputFocused 
                 ? focusBorderColor 
                 : useColorModeValue('gray.200', 'gray.600')}
               boxShadow={isInputFocused 
-                ? `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.25)', 'rgba(129, 230, 217, 0.3)')},
-                  0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`
-                : 'sm'
+                ? `0 0 0 3px ${useColorModeValue('rgba(49, 151, 149, 0.1)', 'rgba(129, 230, 217, 0.2)')}`
+                : 'lg'
               }
               bg={useColorModeValue('white', 'gray.800')}
-              transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-              px={1.5}
-              py={0.5}
+              transition="all 0.2s ease"
+              px={2}
+              py={1}
               _hover={{
                 borderColor: isInputFocused ? focusBorderColor : useColorModeValue('gray.300', 'gray.500'),
-                boxShadow: `0 0 0 1px ${useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')},
-                            0 4px 12px -2px ${useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0.3)')},
-                            0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.15)', 'rgba(129, 230, 217, 0.15)')}`
+                shadow: 'xl'
               }}
               _focusWithin={{
                 borderColor: focusBorderColor,
-                boxShadow: `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.25)', 'rgba(129, 230, 217, 0.3)')},
-                            0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`
+                boxShadow: `0 0 0 3px ${useColorModeValue('rgba(49, 151, 149, 0.1)', 'rgba(129, 230, 217, 0.2)')}`
               }}
             >
               <Box
-                as={motion.div}
-                initial={{ opacity: 0.7 }}
-                animate={{ opacity: 1 }}
                 px={3}
                 color={useColorModeValue('gray.500', 'gray.400')}
               >
-                <FiSearch size={18} />
+                <FiSearch size={20} />
               </Box>
               <Input
                 ref={inputRef}
-                placeholder="Enter space name"
+                placeholder="Enter workspace name to join or create"
                 value={spaceName}
                 onChange={(e) => setSpaceName(e.target.value)}
                 onFocus={() => setIsInputFocused(true)}
@@ -412,66 +405,36 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
                 bg="transparent"
                 color={useColorModeValue('gray.800', 'white')}
                 _placeholder={{ 
-                  color: useColorModeValue('gray.400', 'gray.500'),
-                  fontSize: 'sm',
-                  fontWeight: 'normal',
-                  opacity: 0.8
+                  color: useColorModeValue('gray.500', 'gray.400'),
+                  fontSize: 'md'
                 }}
                 isDisabled={isLoading || isValidating}
-                size="md"
+                size="lg"
                 flexGrow={1}
                 px={2}
-                py={4}
-                fontSize="sm"
-                h="40px"
+                fontSize="md"
                 fontWeight="medium"
               />
               <Button
-                as={motion.button}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 type="submit"
                 colorScheme="teal"
                 isLoading={isLoading || isValidating}
-                loadingText="" // Empty text since we're using a custom spinner
-                size="sm"
-                borderRadius="full"
-                px={4}
-                mx={0.5}
-                my={0.5}
-                height="32px"
-                minW="70px"
+                size="md"
+                borderRadius="md"
+                px={6}
+                mx={1}
+                fontWeight="600"
                 _hover={{
-                  bg: 'teal.600',
-                  transform: 'none',
-                  boxShadow: `0 0 0 1px ${useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')},
-                            0 4px 12px -2px ${useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0.3)')},
-                            0 0 15px -5px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`
+                  transform: 'translateY(-1px)',
+                  shadow: 'lg'
                 }}
-                _active={{
-                  bg: 'teal.700',
-                  transform: 'scale(0.96)'
-                }}
-                _focusVisible={{
-                  boxShadow: `0 0 0 2px ${useColorModeValue('rgba(49, 151, 149, 0.3)', 'rgba(129, 230, 217, 0.3)')},
-                              0 0 0 4px ${useColorModeValue('rgba(49, 151, 149, 0.2)', 'rgba(129, 230, 217, 0.2)')}`,
-                  outline: 'none'
-                }}
-                transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-                spinnerPlacement="start"
-                spinner={
-                  <Spinner 
-                    size="sm" 
-                    color="white"
-                    thickness="2px"
-                    speed="0.8s"
-                    emptyColor="whiteAlpha.500"
-                  />
-                }
+                transition="all 0.2s ease"
+                loadingText="Loading"
               >
-                Go
+                Get Started
               </Button>
             </Flex>
+            {renderErrorMessage()}
           </VStack>
         </Box>
       </ScaleFade>
