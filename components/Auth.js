@@ -369,7 +369,8 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
               bg={useColorModeValue('white', 'gray.800')}
               transition="all 0.2s ease"
               px={2}
-              py={1}
+              py={0.5} // reduced vertical padding
+              minH="48px" // set a minimum height for compactness
               _hover={{
                 borderColor: isInputFocused ? focusBorderColor : useColorModeValue('gray.300', 'gray.500'),
                 shadow: 'xl'
@@ -380,10 +381,13 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
               }}
             >
               <Box
-                px={3}
+                px={2} // reduced horizontal padding
                 color={useColorModeValue('gray.500', 'gray.400')}
+                display="flex"
+                alignItems="center"
+                height="36px"
               >
-                <FiSearch size={20} />
+                <FiSearch size={18} />
               </Box>
               <Input
                 ref={inputRef}
@@ -406,22 +410,23 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
                 color={useColorModeValue('gray.800', 'white')}
                 _placeholder={{ 
                   color: useColorModeValue('gray.500', 'gray.400'),
-                  fontSize: 'md'
+                  fontSize: 'sm' // smaller font
                 }}
                 isDisabled={isLoading || isValidating}
-                size="lg"
+                size="md" // reduced size
                 flexGrow={1}
                 px={2}
-                fontSize="md"
+                fontSize="sm" // smaller font
                 fontWeight="medium"
+                height="36px" // reduced height
               />
               <Button
                 type="submit"
                 colorScheme="teal"
                 isLoading={isLoading || isValidating}
-                size="md"
+                size="sm" // reduced button size
                 borderRadius="md"
-                px={6}
+                px={4} // reduced padding
                 mx={1}
                 fontWeight="600"
                 _hover={{
@@ -430,8 +435,10 @@ export default function Auth({ initialSpaceId = '', initialSpaceName = '', initi
                 }}
                 transition="all 0.2s ease"
                 loadingText="Loading"
+                height="36px" // match input height
+                minW="90px"
               >
-                Get Started
+                Join
               </Button>
             </Flex>
             {renderErrorMessage()}

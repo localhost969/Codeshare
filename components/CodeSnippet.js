@@ -1,189 +1,154 @@
 import React from 'react';
-import { 
-  Box, 
-  Flex, 
-  Text, 
-  IconButton, 
-  useColorModeValue, 
-  Tooltip, 
-  Badge, 
+import {
+  Box,
+  Flex,
+  Text,
+  IconButton,
+  Tooltip,
+  useColorModeValue,
   HStack,
-  Icon,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  useDisclosure,
-  VStack
 } from '@chakra-ui/react';
-import { DeleteIcon, EditIcon, ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons';
-import { FaCode, FaEllipsisV, FaRegCopy, FaDownload, FaShare, FaEdit, FaTrash } from 'react-icons/fa';
-import { languageLabels } from './CodeEditor';  // Import shared language labels
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 
-// Language icons mapping
-const getLanguageIcon = (language) => {
-  const iconColor = useColorModeValue('gray.600', 'gray.400');
-  
-  // You could expand this with more specific icons for each language
-  return <Icon as={FaCode} color={iconColor} boxSize="0.8rem" />;
-};
-
-// Language color mapping
-const getLanguageColor = (language) => {
-  const colorMap = {
-    javascript: 'yellow',
-    typescript: 'blue',
-    python: 'green',
-    html: 'orange',
-    css: 'pink',
-    java: 'red',
-    cpp: 'purple',
-    php: 'teal',
-    sql: 'cyan'
-  };
-  
-  return colorMap[language?.toLowerCase()] || 'gray';
-};
-
-const CodeSnippet = ({ snippet, onSelect, onDelete, onEditTitle, isSelected }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  
-  // Styling
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const selectedBgColor = useColorModeValue('teal.50', 'rgba(48, 140, 122, 0.2)');
-  const selectedBorderColor = useColorModeValue('teal.200', 'teal.700');
-  const hoverBgColor = useColorModeValue('gray.50', 'gray.700');
-  
-  // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffSecs = Math.floor(diffMs / 1000);
-    const diffMins = Math.floor(diffSecs / 60);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffSecs < 60) return 'just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    
-    return date.toLocaleDateString();
-  };
-  
-  // Get proper language display name
-  const getLanguageLabel = (lang) => {
-    return languageLabels[lang?.toLowerCase()] || lang;
-  };
+const CodeSnippet = ({
+  snippet,
+  onSelect,
+  onDelete,
+  onEditTitle,
+  isSelected,
+}) => {
+  const cardBg = useColorModeValue('gray.50', 'gray.800');
+  const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const cardShadow = useColorModeValue('sm', 'sm'); // Chakra's default shadow for subtlety
+  const selectedBorder = useColorModeValue('teal.400', 'teal.300');
+  const hoverBg = useColorModeValue('teal.50', 'rgba(49,151,149,0.15)');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const subColor = useColorModeValue('gray.500', 'gray.400');
 
   return (
-    <Box position="relative">
-      <Flex>
-        <Box 
-          flex={1}
-          p={2.5} 
-          borderWidth="1px" 
-          borderRadius="md" 
-          borderColor={isSelected ? selectedBorderColor : borderColor}
-          bg={isSelected ? selectedBgColor : bgColor}
-          _hover={{ 
-            bg: isSelected ? selectedBgColor : hoverBgColor,
-            borderColor: isSelected ? selectedBorderColor : 'teal.200',
-            transform: 'translateY(-1px)',
-            boxShadow: 'sm'
-          }}
-          transition="all 0.2s"
-          cursor="pointer"
-          onClick={() => onSelect(snippet.id)}
-          position="relative"
-          overflow="hidden"
+    <Flex align="flex-start" w="100%" gap={0}>
+      {/* Main Card */}
+      <Box
+        as="button"
+        flex="1"
+        w="100%"
+        textAlign="left"
+        bg={isSelected ? hoverBg : cardBg}
+        borderWidth="1px"
+        borderColor={isSelected ? selectedBorder : cardBorder}
+        borderRadius="md"
+        boxShadow={cardShadow}
+        px={3}
+        py={2.5}
+        transition="all 0.2s"
+        _hover={{
+          bg: hoverBg,
+          boxShadow: useColorModeValue('md', 'md'),
+          borderColor: selectedBorder,
+          transform: 'translateY(-1px)',
+        }}
+        _active={{
+          transform: 'scale(0.99)',
+          boxShadow: useColorModeValue('sm', 'sm'),
+        }}
+        onClick={() => onSelect(snippet.id)}
+        position="relative"
+        overflow="hidden"
+        role="group"
+      >
+        {/* Rotated Language Tag */}
+        <Box
+          position="absolute"
+          left="-28px"
+          top="50%"
+          transform="translateY(-50%) rotate(-90deg)"
+          fontSize="0.7em"
+          fontWeight="bold"
+          letterSpacing="wide"
+          whiteSpace="nowrap"
+          color={titleColor}
+          px={0}
+          py={0}
         >
-          {/* Selection indicator */}
-          {isSelected && (
-            <Box 
-              position="absolute"
-              left={0}
-              top={0}
-              bottom={0}
-              width="3px"
-              bg="teal.500"
-            />
-          )}
-          
-          <Flex direction="column">
-            {/* Title row */}
-            <Text 
-              fontWeight={isSelected ? "bold" : "medium"} 
-              fontSize="sm" 
-              noOfLines={1}
-              color={isSelected ? "teal.700" : undefined}
-              pl={isSelected ? 2 : 0}
-              mb={1.5}
-            >
-              {snippet.title}
-            </Text>
-            
-            {/* Language and metadata row */}
-            <Flex justify="space-between" align="center" pl={isSelected ? 2 : 0}>
-              <HStack spacing={1.5}>
-                <Badge 
-                  colorScheme={getLanguageColor(snippet.language)} 
-                  variant="subtle" 
-                  fontSize="xs"
-                  px={1.5}
-                  py={0.5}
-                  borderRadius="full"
-                >
-                  <Flex align="center" gap={1}>
-                    {getLanguageIcon(snippet.language)}
-                    <Text>{getLanguageLabel(snippet.language)}</Text>
-                  </Flex>
-                </Badge>
-              </HStack>
-              
-              <Text fontSize="xs" color="gray.500" fontStyle="italic">
-                {formatDate(snippet.updatedAt)}
-              </Text>
-            </Flex>
-          </Flex>
+          #{snippet.language}
         </Box>
+        <Flex align="flex-start" justify="space-between">
+          <Box flex="1" minW={0}>
+            <HStack spacing={2} align="center">
+              <Text
+                fontWeight="600"
+                fontSize="sm"
+                color={titleColor}
+                isTruncated
+                maxW="180px"
+                lineHeight="1.25"
+              >
+                {snippet.title}
+              </Text>
+            </HStack>
+            <Text
+              fontSize="xx-small"
+              color={subColor}
+              mt={1}
+              lineHeight="1.3"
+            >
+              Last updated: {new Date(snippet.updatedAt).toLocaleString(undefined, {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Text>
+          </Box>
 
-        {/* Action buttons vertically on the right */}
-        <VStack 
-          spacing={1} 
-          ml={1}
-          justify="center"
-        >
-          <IconButton
-            icon={<FaEdit />}
-            size="xs"
-            variant="ghost"
-            colorScheme="teal"
-            aria-label="Edit snippet title"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditTitle(snippet.id);
-            }}
-          />
-          <IconButton
-            icon={<FaTrash />}
-            size="xs"
-            variant="ghost"
-            colorScheme="red"
-            aria-label="Delete snippet"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(snippet.id);
-            }}
-          />
-        </VStack>
-      </Flex>
-    </Box>
+          <HStack spacing={0.5} ml={2} opacity={0} _groupHover={{ opacity: 1 }} transition="opacity 0.2s">
+            <Tooltip label="Edit title" hasArrow>
+              <IconButton
+                icon={<EditIcon />}
+                size="xs"
+                variant="ghost"
+                aria-label="Edit title"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditTitle(snippet.id);
+                }}
+                _hover={{ color: 'teal.500', bg: 'teal.50' }}
+                color={isSelected ? 'teal.500' : 'gray.500'}
+              />
+            </Tooltip>
+            <Tooltip label="Delete snippet" hasArrow>
+              <IconButton
+                icon={<DeleteIcon />}
+                size="xs"
+                variant="ghost"
+                aria-label="Delete snippet"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(snippet.id);
+                }}
+                _hover={{ color: 'red.500', bg: 'red.50' }}
+                color="gray.500"
+              />
+            </Tooltip>
+          </HStack>
+        </Flex>
+
+        {/* Tags at the bottom */}
+        <Flex mt={2} wrap="wrap" gap={2}>
+          {snippet.tags?.map((tag) => (
+            <Text
+              key={tag}
+              fontSize="0.65em"
+              textTransform="capitalize"
+            >
+              #{tag}
+            </Text>
+          ))}
+        </Flex>
+      </Box>
+    </Flex>
   );
 };
 
-export default CodeSnippet;
+export default React.memo(CodeSnippet);

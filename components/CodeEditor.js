@@ -16,14 +16,6 @@ import {
   Input, 
   InputGroup, 
   InputRightElement, 
-  useDisclosure, 
-  Modal, 
-  ModalOverlay, 
-  ModalContent, 
-  ModalHeader, 
-  ModalFooter, 
-  ModalBody, 
-  ModalCloseButton,
   Badge,
   Kbd
 } from '@chakra-ui/react';
@@ -162,7 +154,7 @@ const CodeEditor = ({
   const [selectedTheme, setSelectedTheme] = useState(initialTheme);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [replaceQuery, setReplaceQuery] = useState('');
+  // ...removed onRun prop...
   const [showSearch, setShowSearch] = useState(false);
   const [editorContent, setEditorContent] = useState(value || '');
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -172,8 +164,7 @@ const CodeEditor = ({
   const editorView = useRef(null);
   const [searchResults, setSearchResults] = useState(0);
   const [currentMatch, setCurrentMatch] = useState(0);
-  const { isOpen: isSettingsOpen, onOpen: onSettingsOpen, onClose: onSettingsClose } = useDisclosure();
-  const { isOpen: isKeyboardShortcutsOpen, onOpen: onKeyboardShortcutsOpen, onClose: onKeyboardShortcutsClose } = useDisclosure();
+  // Removed settings and keyboard shortcuts modal state
 
   // Auto-switch theme based on color mode
   useEffect(() => {
@@ -542,12 +533,9 @@ const CodeEditor = ({
           gap={2}
         >
           <HStack spacing={2}>
-            <Text fontWeight="bold">Code Editor</Text>
+            <Text fontWeight="bold"></Text>
             {!readOnly && (
               <>
-                <Badge colorScheme="green" variant="subtle">
-                  {cursorPosition.line}:{cursorPosition.column}
-                </Badge>
                 <Badge 
                   colorScheme={savingStatus === 'saved' ? 'green' : savingStatus === 'saving' ? 'blue' : 'yellow'} 
                   variant="subtle"
@@ -652,14 +640,7 @@ const CodeEditor = ({
                     </Tooltip>
                   )}
 
-                  <Tooltip label="Settings">
-                    <IconButton
-                      aria-label="Settings"
-                      icon={<FaCog />}
-                      size="sm"
-                      onClick={onSettingsOpen}
-                    />
-                  </Tooltip>
+                  {/* Removed Settings Button */}
                 </>
               )}
 
@@ -770,134 +751,11 @@ const CodeEditor = ({
           />
         </Box>
 
-        {/* Settings Modal */}
-        <Modal isOpen={isSettingsOpen} onClose={onSettingsClose} size="lg">
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Editor Settings</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex direction="column" gap={4}>
-                <Box>
-                  <Text mb={2}>Font Size</Text>
-                  <Flex alignItems="center" gap={2}>
-                    <Text>12px</Text>
-                    <Input 
-                      type="range" 
-                      min="12" 
-                      max="24" 
-                      value={fontSize} 
-                      onChange={(e) => {
-                        // This would be handled with state in a real implementation
-                        // setFontSize(parseInt(e.target.value))
-                      }} 
-                    />
-                    <Text>24px</Text>
-                  </Flex>
-                </Box>
-
-                <Box>
-                  <Text mb={2}>Tab Size</Text>
-                  <Select 
-                    value={tabSize} 
-                    onChange={(e) => {
-                      // This would be handled with state in a real implementation
-                      // setTabSize(parseInt(e.target.value))
-                    }}
-                  >
-                    <option value="2">2 spaces</option>
-                    <option value="4">4 spaces</option>
-                    <option value="8">8 spaces</option>
-                  </Select>
-                </Box>
-
-                <Box>
-                  <Text mb={2}>Auto Save</Text>
-                  <Select 
-                    value={autoSave ? "true" : "false"} 
-                    onChange={(e) => {
-                      // This would be handled with state in a real implementation
-                      // setAutoSave(e.target.value === "true")
-                    }}
-                  >
-                    <option value="true">Enabled</option>
-                    <option value="false">Disabled</option>
-                  </Select>
-                </Box>
-
-                <Button colorScheme="blue" onClick={onKeyboardShortcutsOpen}>
-                  View Keyboard Shortcuts
-                </Button>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={onSettingsClose}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        {/* Keyboard Shortcuts Modal */}
-        <Modal isOpen={isKeyboardShortcutsOpen} onClose={onKeyboardShortcutsClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Keyboard Shortcuts</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex direction="column" gap={2}>
-                <Flex justify="space-between">
-                  <Text>Find</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>F</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Replace</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>H</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Save</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>S</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Undo</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>Z</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Redo</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>Y</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Comment Line</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>/</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Indent</Text>
-                  <Kbd>Tab</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Outdent</Text>
-                  <Kbd>Shift</Kbd> + <Kbd>Tab</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Multiple Cursors</Text>
-                  <Kbd>Alt</Kbd> + <Kbd>Click</Kbd>
-                </Flex>
-                <Flex justify="space-between">
-                  <Text>Select All</Text>
-                  <Kbd>Ctrl</Kbd> + <Kbd>A</Kbd>
-                </Flex>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={onKeyboardShortcutsClose}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        {/* Removed Settings Modal and Keyboard Shortcuts Modal */}
       </Box>
     </>
   );
 };
 
 export default CodeEditor;
+            

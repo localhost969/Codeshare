@@ -121,7 +121,7 @@ export default function WorkspacePage() {
   }
 
   return (
-    <Box layerStyle="gradientBackground" minH="100vh">
+    <Box layerStyle="gradientBackground" minH="100vh" ml="280px">
       <Workspace 
         spaceId={id} 
         spaceName={spaceData?.name || name} 

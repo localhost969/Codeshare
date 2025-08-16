@@ -73,16 +73,16 @@ export default function Footer() {
               justifyContent="center"
               width="100%"
             >
-              &copy; {new Date().getFullYear()} Codeshare. All rights reserved. | Crafted by{' '}
+              &copy; {new Date().getFullYear()} Codeshare | designed by{' '}
               <Box
                 as="span"
                 color={accentColor}
-                fontWeight="bold"
+                fontWeight="medium"
                 fontFamily="heading"
-                px={1}
-                borderBottom="2px solid"
-                borderColor={accentColor}
                 ml={1}
+                px={0}
+                border="none"
+                borderBottom="none"
               >
                 Vardan
               </Box>

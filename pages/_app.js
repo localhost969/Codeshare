@@ -134,10 +134,21 @@ function MyApp({ Component, pageProps }) {
       <ColorModeScript initialColorMode={theme.config.initialColorMode} key="chakra-color-mode-script" />
       <ChakraProvider theme={theme}>
         <ColorModeSync />
-        <Box as="main">
+        <Box as="main" pb="60px">
           <Component {...pageProps} />
         </Box>
-        <Footer />
+        <Box
+          as="footer"
+          position="fixed"
+          left={0}
+          bottom={0}
+          width="100%"
+          zIndex={100}
+          bg="chakra-body-bg"
+          // Optional: add shadow or border if desired
+        >
+          <Footer />
+        </Box>
       </ChakraProvider>
     </>
   );

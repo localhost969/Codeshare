@@ -1,6 +1,6 @@
 import { Box, useColorModeValue, Divider, Container } from "@chakra-ui/react";
 import Hero from '../components/Hero';
-import Footer from '../components/Footer';
+
 
 export default function Home() {
   const dividerColor = useColorModeValue('gray.200', 'gray.700');
@@ -22,11 +22,11 @@ export default function Home() {
           'linear(to-b, cyan.800, gray.900)'
         )}
         position="relative"
+        pb={0}
+        mb={0}
       >
         <Hero />
       </Box>
-
-      
     </Box>
   );
 }

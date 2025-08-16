@@ -355,13 +355,11 @@ const SnippetCard = ({ snippet, onSelect, viewMode, onEditTitle, onDeleteSnippet
           justify="space-between"
           align="center"
           minH="48px"
-          bg={useColorModeValue('gray.50', 'gray.800')}
+          // Use same bg as header (sectionBg)
+          bg={useColorModeValue('white', 'gray.800')}
         >
-          <Tag size="sm" colorScheme="teal" borderRadius="full" maxW="120px">
-            <TagLabel isTruncated>{language || 'unknown'}</TagLabel>
-          </Tag>
-          <Text fontSize="xs" color={textColor} isTruncated maxW="120px">
-            {formatDate(updatedAt || createdAt)}
+          <Text fontSize="xs" color={textColor} fontWeight="medium" maxW="240px" >
+            Last opened: {formatDate(updatedAt || createdAt)}
           </Text>
         </Flex>
       </Flex>
@@ -475,7 +473,7 @@ const EmptyResults = ({ onAddSnippet, hasFilters, onClearFilters }) => {
 };
 
 // Search bar with keyboard shortcut hint
-const SearchBar = ({ value, onChange, onKeyDown }) => {
+const SearchBar = ({ value, onChange, onKeyDown, inputRef }) => {
   return (
     <InputGroup size="md">
       <InputLeftElement pointerEvents="none">
@@ -490,6 +488,7 @@ const SearchBar = ({ value, onChange, onKeyDown }) => {
         borderRadius="full"
         bg={useColorModeValue('white', 'gray.800')}
         _focus={{ borderColor: 'teal.400', boxShadow: '0 0 0 1px var(--chakra-colors-teal-400)' }}
+        ref={inputRef}
       />
       
       <Tooltip label="Press '/' to focus search" placement="bottom">
@@ -620,7 +619,9 @@ const SortMenu = ({ sortOrder, setSortOrder }) => {
   );
 };
 
-const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDeleteSnippet }) => {
+import { FaSignOutAlt } from 'react-icons/fa';
+
+const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDeleteSnippet, onSignOut }) => {
   const { colorMode } = useColorMode();
   // State management
   const [filteredSnippets, setFilteredSnippets] = useState([]);
@@ -806,7 +807,7 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
       bg={bgColor}
       {...browseViewStyles}
     >
-      {/* Header with search and actions */}
+      {/* Header and filter bar combined */}
       <Box 
         py={4} 
         px={6} 
@@ -816,7 +817,15 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
         position="sticky"
         top={0}
         zIndex={10}
+        // Add borderRadius and boxShadow for consistency with filter bar
+        borderTopLeftRadius="0"
+        borderTopRightRadius="0"
+        borderBottomLeftRadius="md"
+        borderBottomRightRadius="md"
+        boxShadow="sm"
+        width={{ base: "100%", md: "calc(100% - 0px)" }}
       >
+        {/* Header with search and actions */}
         <Flex 
           justify="space-between" 
           align="center" 
@@ -869,11 +878,10 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
               value={searchQuery} 
               onChange={handleSearchChange}
               onKeyDown={(e) => e.key === 'Escape' && setSearchQuery('')}
+              inputRef={searchInputRef}
             />
-            
             {/* View toggle */}
             <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-            
             {/* Create new snippet button */}
             <Button
               leftIcon={<AddIcon boxSize={3.5} />}
@@ -905,9 +913,26 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
               <Box as="span" display={{ base: 'none', sm: 'inline' }}>New Snippet</Box>
               <Box as="span" display={{ base: 'inline', sm: 'none' }}>New</Box>
             </Button>
+            {/* Sign Out button inside BrowseView header actions */}
+            <Button
+              leftIcon={<FaSignOutAlt />}
+              size="sm"
+              variant={colorMode === 'dark' ? 'outline' : 'solid'}
+              colorScheme="teal"
+              onClick={onSignOut}
+              fontWeight="medium"
+              px={3}
+              aria-label="Sign out"
+              minW="36px"
+              justifyContent="center"
+            />
           </HStack>
         </Flex>
         
+         {/* Professional divider line */}
+        <Divider my={6} borderColor={useColorModeValue('gray.200', 'gray.700')} borderWidth="1px" borderRadius="full" />
+
+
         {/* Active filters */}
         {hasActiveFilters && (
           <Box mt={4}>
@@ -937,26 +962,18 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
             </Flex>
           </Box>
         )}
-      </Box>
-      
-      {/* Main content area */}
-      <Box 
-        flex="1" 
-        overflow="auto" 
-        p={6}
-        position="relative"
-      >
-        {/* Toolbar */}
+
+        {/* Toolbar (filters and sort) */}
         <Flex 
-          mb={6} 
+          mt={6} 
+          mb={0} 
           justify="space-between"
           align="center"
-          bg={sectionBg}
-          p={3}
-          borderRadius="md"
-          borderWidth="1px"
-          borderColor={borderColor}
-          boxShadow="sm"
+          bg="transparent"
+          p={0}
+          borderRadius="none"
+          borderWidth="0"
+          boxShadow="none"
         >
           {/* Left side: Filter tags */}
           <HStack spacing={3} overflow="auto" pb={1}>
@@ -1065,7 +1082,17 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
           {/* Right side: Sort options */}
           <SortMenu sortOrder={sortOrder} setSortOrder={setSortOrder} />
         </Flex>
-        
+
+       
+      </Box>
+      
+      {/* Main content area */}
+      <Box 
+        flex="1" 
+        overflow="auto" 
+        p={6}
+        position="relative"
+      >
         {/* Snippets grid or list */}
         {filteredSnippets.length > 0 ? (
           viewMode === 'grid' ? (

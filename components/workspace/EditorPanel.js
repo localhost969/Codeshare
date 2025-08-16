@@ -11,7 +11,7 @@ import {
   Flex
 } from '@chakra-ui/react';
 import CodeEditor from '../CodeEditor';
-import CodeRunner from '../CodeRunner';
+// ...removed CodeRunner import...
 
 const EditorPanel = ({ code, language, onChange, onLanguageChange, lastEditedTime }) => {
   const { colorMode } = useColorMode();
@@ -48,34 +48,8 @@ const EditorPanel = ({ code, language, onChange, onLanguageChange, lastEditedTim
         overflow="hidden"
       >
         <TabList mb={4}>
-          <Tab 
-            fontWeight="medium" 
-            _selected={{ 
-              color: colorMode === 'dark' ? 'teal.200' : 'teal.500', 
-              bg: useColorModeValue('teal.50', 'rgba(48, 140, 122, 0.3)'),
-              fontWeight: 'bold',
-              boxShadow: colorMode === 'dark' ? '0 0 10px rgba(72, 187, 120, 0.3)' : 'none'
-            }}
-            _hover={{
-              bg: colorMode === 'dark' ? 'rgba(48, 140, 122, 0.15)' : 'teal.50'
-            }}
-          >
-            Code Editor
-          </Tab>
-          <Tab 
-            fontWeight="medium"
-            _selected={{ 
-              color: colorMode === 'dark' ? 'teal.200' : 'teal.500', 
-              bg: useColorModeValue('teal.50', 'rgba(48, 140, 122, 0.3)'),
-              fontWeight: 'bold',
-              boxShadow: colorMode === 'dark' ? '0 0 10px rgba(72, 187, 120, 0.3)' : 'none'
-            }}
-            _hover={{
-              bg: colorMode === 'dark' ? 'rgba(48, 140, 122, 0.15)' : 'teal.50'
-            }}
-          >
-            Run Code
-          </Tab>
+          
+          
         </TabList>
         
         <TabPanels>
@@ -106,7 +80,7 @@ const EditorPanel = ({ code, language, onChange, onLanguageChange, lastEditedTim
                   height="40vh"
                 />
               </Box>
-              <CodeRunner code={code} language={language} />
+              {/* CodeRunner component removed */}
             </Flex>
           </TabPanel>
         </TabPanels>

@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Import components
 import CodeEditor from './CodeEditor';
 import Sidebar from './Sidebar';
-import CodeRunner from './CodeRunner';
+// ...removed CodeRunner import...
 
 // Import workspace sub-components
 import WorkspaceHeader from './workspace/WorkspaceHeader';
@@ -420,14 +420,15 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
         
         {/* Main content area */}
         <Flex flex="1" direction="column" overflow="hidden">
-          {/* Header with workspace controls */}
-          <WorkspaceHeader 
-            title={selectedSnippetId ? snippets.find(s => s.id === selectedSnippetId)?.title : ''}
-            hasActiveSnippet={!!selectedSnippetId}
-            onCloseEditor={handleCloseEditor}
-            onSignOut={onSignOut}
-          />
-          
+          {/* Header with workspace controls - only show in editor mode */}
+          {currentView === 'editor' && selectedSnippetId && (
+            <WorkspaceHeader 
+              title={selectedSnippetId ? snippets.find(s => s.id === selectedSnippetId)?.title : ''}
+              hasActiveSnippet={!!selectedSnippetId}
+              onCloseEditor={handleCloseEditor}
+              onSignOut={onSignOut}
+            />
+          )}
           {/* Main content area: Editor or Browse View */}
           {currentView === 'editor' && selectedSnippetId ? (
             <EditorPanel 
@@ -444,6 +445,7 @@ const Workspace = ({ spaceId, spaceName, onSignOut }) => {
               onAddSnippet={() => setIsNewSnippetModalOpen(true)}
               onEditTitle={openEditTitleModal}
               onDeleteSnippet={handleDeleteSnippet}
+              onSignOut={onSignOut}
             />
           )}
         </Flex>

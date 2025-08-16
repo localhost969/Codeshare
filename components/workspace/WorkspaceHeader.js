@@ -2,13 +2,14 @@ import React from 'react';
 import {
   Flex,
   Text,
-  IconButton,
   Tooltip,
   useColorModeValue,
   useColorMode,
   HStack,
   Box,
-  Badge
+  Badge,
+  VisuallyHidden,
+  Button
 } from '@chakra-ui/react';
 import { FaSignOutAlt, FaTimes } from 'react-icons/fa';
 
@@ -60,7 +61,7 @@ const WorkspaceHeader = ({
                 borderRadius="md"
                 boxShadow={colorMode === 'dark' ? '0 0 5px rgba(49, 151, 149, 0.5)' : 'none'}
               >
-                EDITING
+                CURRENTLY VIEWING : {title}
               </Badge>
               <Text 
                 fontSize="sm" 
@@ -69,7 +70,7 @@ const WorkspaceHeader = ({
                 noOfLines={1}
                 title={title}
               >
-                {title}
+                
               </Text>
             </HStack>
           ) : (
@@ -82,41 +83,37 @@ const WorkspaceHeader = ({
           )}
         </Flex>
         
-        <HStack spacing={1}>
+        <HStack spacing={2}>
           {hasActiveSnippet && (
             <Tooltip label="Close editor" placement="bottom">
-              <IconButton
-                icon={<FaTimes />}
-                aria-label="Close editor"
+              <Button
+                leftIcon={<FaTimes />}
                 size="sm"
-                variant="ghost"
-                color={colorMode === 'dark' ? 'teal.200' : textColor}
-                _hover={{ 
-                  bg: useColorModeValue('gray.100', 'gray.700'),
-                  color: colorMode === 'dark' ? 'teal.100' : 'teal.600',
-                  transform: 'scale(1.05)'
-                }}
-                transition="all 0.2s"
+                variant={colorMode === 'dark' ? 'outline' : 'solid'}
+                colorScheme="teal"
                 onClick={onCloseEditor}
-              />
+                fontWeight="medium"
+                px={3}
+                aria-label="Close editor"
+              >
+                Close
+              </Button>
             </Tooltip>
           )}
-          
+
           <Tooltip label="Sign out" placement="bottom">
-            <IconButton
-              icon={<FaSignOutAlt />}
-              aria-label="Sign out"
+            <Button
+              leftIcon={<FaSignOutAlt />}
               size="sm"
-              variant="ghost"
-              color={colorMode === 'dark' ? 'teal.200' : textColor}
-              _hover={{ 
-                bg: useColorModeValue('gray.100', 'gray.700'),
-                color: colorMode === 'dark' ? 'teal.100' : 'teal.600',
-                transform: 'scale(1.05)'
-              }}
-              transition="all 0.2s"
+              variant={colorMode === 'dark' ? 'outline' : 'solid'}
+              colorScheme="teal"
               onClick={onSignOut}
-            />
+              fontWeight="medium"
+              px={3}
+              aria-label="Sign out"
+            >
+              Sign Out
+            </Button>
           </Tooltip>
         </HStack>
       </Flex>
@@ -125,3 +122,4 @@ const WorkspaceHeader = ({
 };
 
 export default React.memo(WorkspaceHeader);
+            

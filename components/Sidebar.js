@@ -175,28 +175,27 @@ const Sidebar = ({
         bg={sidebarBg} 
         borderRightWidth="1px"
         borderColor={borderColor}
-        overflow="hidden"
+        overflow="hidden" // ensure no scrollbars on y-axis
         {...sidebarGradient}
         transition="all 0.2s"
+        position="fixed"
+        top={0}
+        left={0}
+        zIndex={120}
       >
       {/* Header */}
       <Box 
         p={4} 
-        bg={headerBgColor} 
         borderBottomWidth="1px" 
         borderColor={borderColor}
-        bgGradient={colorMode === 'dark' ? 'linear(to-r, gray.800, gray.850)' : 'none'}
-        boxShadow={colorMode === 'dark' ? 'inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)' : 'none'}
+        bg={sidebarBg}
       >
         <Flex justify="space-between" align="center" mb={3}>
           <Heading 
             size="md" 
             fontWeight="bold" 
             color={accentColor}
-            textShadow={colorMode === 'dark' ? '0 0 8px rgba(49, 151, 149, 0.4)' : 'none'}
             letterSpacing="tight"
-            bgGradient={colorMode === 'dark' ? 'linear(to-r, teal.300, blue.300)' : 'none'}
-            bgClip={colorMode === 'dark' ? 'text' : 'none'}
           >
             CodeShare
           </Heading>
@@ -427,7 +426,7 @@ const Sidebar = ({
       </Box>
       
       {/* Snippets List */}
-      <Box flex="1" overflowY="auto" p={3}>
+      <Box flex="1" p={3}>
         {filteredSnippets.length > 0 ? (
           <VStack align="stretch" spacing={2}>
             {filteredSnippets.map(snippet => (
