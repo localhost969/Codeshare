@@ -79,9 +79,9 @@ function MyApp({ Component, pageProps }) {
             min-width: auto !important;
           }
 
-          /* Custom Scrollbar Styles */
+          /* Custom Scrollbar Styles - Thinner and Color Themed */
           ::-webkit-scrollbar {
-            width: 4px;
+            width: 2px;
             height: 4px;
           }
 
@@ -90,7 +90,7 @@ function MyApp({ Component, pageProps }) {
           }
 
           ::-webkit-scrollbar-thumb {
-            background: rgba(203, 213, 225, 0.7);
+            background: var(--chakra-colors-gray-400, #CBD5E1);
             border-radius: 2px;
             border: 1px solid transparent;
             background-clip: content-box;
@@ -98,7 +98,7 @@ function MyApp({ Component, pageProps }) {
           }
 
           ::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.9);
+            background: var(--chakra-colors-gray-500, #94A3B8);
             background-clip: content-box;
           }
 
@@ -108,21 +108,21 @@ function MyApp({ Component, pageProps }) {
 
           /* Dark mode scrollbar */
           [data-theme="dark"] ::-webkit-scrollbar-thumb {
-            background: rgba(71, 85, 105, 0.8);
+            background: var(--chakra-colors-gray-700, #475569);
           }
 
           [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-            background: rgba(100, 116, 139, 0.9);
+            background: var(--chakra-colors-gray-600, #64748B);
           }
 
           /* Firefox scrollbar */
           * {
             scrollbar-width: thin;
-            scrollbar-color: rgba(203, 213, 225, 0.7) transparent;
+            scrollbar-color: var(--chakra-colors-gray-400, #CBD5E1) transparent;
           }
 
           [data-theme="dark"] * {
-            scrollbar-color: rgba(71, 85, 105, 0.8) transparent;
+            scrollbar-color: var(--chakra-colors-gray-700, #475569) transparent;
           }
 
           /* Enhanced scrollbar for better UX */

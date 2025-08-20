@@ -915,17 +915,23 @@ const BrowseView = ({ snippets, onSelectSnippet, onAddSnippet, onEditTitle, onDe
             </Button>
             {/* Sign Out button inside BrowseView header actions */}
             <Button
-              leftIcon={<FaSignOutAlt />}
               size="sm"
               variant={colorMode === 'dark' ? 'outline' : 'solid'}
               colorScheme="teal"
               onClick={onSignOut}
               fontWeight="medium"
-              px={3}
+              px={0}
               aria-label="Sign out"
               minW="36px"
+              w="80px"
+              h="40px"
+              display="flex"
+              alignItems="center"
               justifyContent="center"
-            />
+              borderRadius="5px"
+            >
+              <FaSignOutAlt size={24} />
+            </Button>
           </HStack>
         </Flex>
         
