@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Berkeley+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+/* ---------- LIGHT MODE (DEFAULT) ---------- */
+:root {
+  color-scheme: light;
+  
+  /* Solar Mist: Warm, misty sunlight with subtle tech undertones */
+  --background: #ffffff; /* Soft solar cream */
+  --foreground: #232b2b; /* Deep graphite */
+  --muted: #a8b5a0; /* Subtle sage */
+  --accent: #10b981; /* Professional emerald */
+  --accent-hover: #059669; /* Deep forest green */
+  --border: #6b7b6b; /* Darker sage for better visibility */
+  --code-bg: #f0f9f0; /* Pale green parchment */
+
+  --skeleton-base: #e5e7eb;
+  --skeleton-highlight: #f3f4f6;
+
+  --font-sans: "Cal Sans", "Inter", "Segoe UI", sans-serif;
+  --font-mono: "Berkeley Mono", "JetBrains Mono", "Monaco", monospace;
+}
+
+/* ---------- DARK MODE (CLASS-BASED) ---------- */
+html.dark {
+  color-scheme: dark;
+  
+  /* Professional Dark: Subdued grays and blues for a corporate look */
+  --background: #0f1419; /* Deep charcoal */
+  --foreground: #f5f7fa; /* Soft off-white */
+  --muted: #4a5568; /* Muted slate */
+  --accent: #3182ce; /* Professional blue */
+  --accent-hover: #2c5282; /* Deeper navy */
+  --border: #2d3748; /* Subtle gray */
+  --code-bg: #1a202c; /* Dark gray */
+
+  --skeleton-base: #2d3748;
+  --skeleton-highlight: #4a5568;
+
+  --font-sans: "Cal Sans", "Inter", "Segoe UI", sans-serif;
+  --font-mono: "Berkeley Mono", "JetBrains Mono", "Monaco", monospace;
+}
+
+/* Fallback to system preference if no class is set */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    color-scheme: dark;
+    
+    --background: #0f1419;
+    --foreground: #f5f7fa;
+    --muted: #4a5568;
+    --accent: #3182ce;
+    --accent-hover: #2c5282;
+    --border: #2d3748;
+    --code-bg: #1a202c;
+
+    --skeleton-base: #2d3748;
+    --skeleton-highlight: #4a5568;
+
+    --font-sans: "Cal Sans", "Inter", "Segoe UI", sans-serif;
+    --font-mono: "Berkeley Mono", "JetBrains Mono", "Monaco", monospace;
+  }
+}
+
+/* ---------- BASE STYLES ---------- */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  font-family: var(--font-sans);
+}
+
+code {
+  background: var(--code-bg);
+  padding: 0.22em 0.44em;
+  border-radius: 7px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 1.02em;
+  font-variant-ligatures: none;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline dotted;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline wavy;
+}
