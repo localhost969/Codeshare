@@ -127,103 +127,124 @@ export default function Bar() {
     };
 
     return (
-        <div className="max-w-xl mx-auto mb-8">
+        <div className="w-full mb-8">
             <div className="relative">
                 {step === 'search' && (
                     <form onSubmit={handleSearch} className="space-y-4">
-                        <input
-                            type="text"
-                            placeholder="Enter username "
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-full px-4 py-3 pr-10 rounded-lg border transition-colors"
-                            style={{
-                                borderColor: isFocused ? (isDark ? 'white' : 'var(--accent)') : (isDark ? 'white' : 'var(--border)'),
-                                backgroundColor: 'var(--background)',
-                                color: isDark ? 'white' : 'var(--foreground)',
-                            }}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            aria-label="Enter username or code ID"
-                            disabled={isLoading}
-                            required
-                        />
-                        <button
-                            type="submit"
-                            disabled={isLoading || !username.trim()}
-                            className="w-full py-2 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-white"
-                            style={{ backgroundColor: 'var(--accent)' }}
-                            onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
-                            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
-                        >
-                            {isLoading ? 'Checking...' : 'Continue'}
-                        </button>
+                        <div className="relative flex items-center gap-3 max-w-2xl mx-auto">
+                            <div className="flex-1 relative flex items-center">
+                                <svg 
+                                    className="absolute left-4 w-5 h-5 pointer-events-none" 
+                                    style={{ color: 'var(--foreground)' }}
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <input
+                                    type="text"
+                                    placeholder="Enter space name or username..."
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 rounded-full border-2 transition-all outline-none"
+                                    style={{
+                                        borderColor: isFocused ? 'var(--accent)' : 'rgba(200, 200, 200, 0.3)',
+                                        backgroundColor: 'var(--background)',
+                                        color: isDark ? 'white' : 'var(--foreground)',
+                                    }}
+                                    onFocus={() => setIsFocused(true)}
+                                    onBlur={() => setIsFocused(false)}
+                                    aria-label="Enter username or code ID"
+                                    disabled={isLoading}
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isLoading || !username.trim()}
+                                className="py-3 px-6 rounded-full font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-white whitespace-nowrap flex items-center gap-2"
+                                style={{ backgroundColor: 'var(--accent)' }}
+                                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
+                                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
+                            >
+                                {isLoading ? 'Checking...' : 'Go'}
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="text-center text-sm" style={{ color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)' }}>
+                            Enter any space name to join or create a new collaborative coding space
+                        </div>
                         {error && (
-                            <div className="px-4 py-2 rounded-lg text-sm mt-2" style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.1)' : 'rgba(220, 38, 38, 0.1)', color: '#dc2626' }}>{error}</div>
+                            <div className="px-4 py-2 rounded-lg text-sm mt-2 max-w-2xl mx-auto" style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.1)' : 'rgba(220, 38, 38, 0.1)', color: '#dc2626' }}>{error}</div>
                         )}
                     </form>
                 )}
                 {step === 'password' && (
                     <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 pr-10 rounded-lg border transition-colors"
-                            style={{
-                                borderColor: isFocused ? (isDark ? 'white' : 'var(--accent)') : (isDark ? 'white' : 'var(--border)'),
-                                backgroundColor: 'var(--background)',
-                                color: isDark ? 'white' : 'var(--foreground)',
-                            }}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            aria-label="Password"
-                            disabled={isLoading}
-                            required
-                        />
-                        {!userExists && (
+                        <div className="max-w-2xl mx-auto space-y-3">
                             <input
                                 type="password"
-                                placeholder="Confirm Password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full px-4 py-3 pr-10 rounded-lg border transition-colors"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-4 py-3 rounded-full border-2 transition-all outline-none"
                                 style={{
-                                    borderColor: isFocused ? (isDark ? 'white' : 'var(--accent)') : (isDark ? 'white' : 'var(--border)'),
+                                    borderColor: isFocused ? 'var(--accent)' : 'rgba(200, 200, 200, 0.3)',
                                     backgroundColor: 'var(--background)',
                                     color: isDark ? 'white' : 'var(--foreground)',
                                 }}
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
-                                aria-label="Confirm Password"
+                                aria-label="Password"
                                 disabled={isLoading}
                                 required
                             />
-                        )}
-                        {error && (
-                            <div className="px-4 py-2 rounded-lg text-sm" style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.1)' : 'rgba(220, 38, 38, 0.1)', color: '#dc2626' }}>{error}</div>
-                        )}
-                        <div className="flex gap-3">
-                            <button
-                                type="button"
-                                onClick={handleBackToSearch}
-                                disabled={isLoading}
-                                className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors border"
-                                style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
-                            >
-                                Back
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isLoading || !password}
-                                className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-white"
-                                style={{ backgroundColor: 'var(--accent)' }}
-                                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
-                                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
-                            >
-                                {isLoading ? 'Processing...' : userExists ? 'Sign In' : 'Create Space'}
-                            </button>
+                            {!userExists && (
+                                <input
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-full border-2 transition-all outline-none"
+                                    style={{
+                                        borderColor: isFocused ? 'var(--accent)' : 'rgba(200, 200, 200, 0.3)',
+                                        backgroundColor: 'var(--background)',
+                                        color: isDark ? 'white' : 'var(--foreground)',
+                                    }}
+                                    onFocus={() => setIsFocused(true)}
+                                    onBlur={() => setIsFocused(false)}
+                                    aria-label="Confirm Password"
+                                    disabled={isLoading}
+                                    required
+                                />
+                            )}
+                            {error && (
+                                <div className="px-4 py-2 rounded-lg text-sm" style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.1)' : 'rgba(220, 38, 38, 0.1)', color: '#dc2626' }}>{error}</div>
+                            )}
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={handleBackToSearch}
+                                    disabled={isLoading}
+                                    className="flex-1 py-3 px-4 rounded-full font-semibold transition-colors border-2"
+                                    style={{ borderColor: 'rgba(200, 200, 200, 0.3)', color: 'var(--foreground)' }}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading || !password}
+                                    className="flex-1 py-3 px-4 rounded-full font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-white"
+                                    style={{ backgroundColor: 'var(--accent)' }}
+                                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
+                                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
+                                >
+                                    {isLoading ? 'Processing...' : userExists ? 'Sign In' : 'Create Space'}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 )}
