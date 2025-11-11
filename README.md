@@ -8,7 +8,7 @@ A collaborative code sharing platform built with **Next.js** | **TypeScript** | 
 
 | Homescreen |  Editor |
 |-----------|---------------|
-| ![Dashboard](./public/home.png) | ![Editor](./public/d1.png) |
+| <img width="1353" height="767" alt="image" src="https://github.com/user-attachments/assets/5cb1c87e-8fcb-43b4-aaba-315d82b23f42" /> | ![Editor](./public/d1.png) |
 
 ---
 
